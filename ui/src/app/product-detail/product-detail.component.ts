@@ -22,17 +22,23 @@ export class ProductDetailComponent {
 
   product: IProduct = null;
 
+  /** Set when the API has no product with the requested id (e.g. an old link to a removed item). */
+  notFound: boolean = false;
+
   addQuantity: number = 0;
 
   constructor() {
     this.activatedRoute.params.subscribe({
       next: (params: Params) => {
         const id = parseInt(params['id']);
+        this.product = null;
+        this.notFound = false;
         this.productSvc.getProduct(id)
           .then(product => {
             this.product = product;
           })
           .catch(error => {
+            this.notFound = true;
             console.error(`Product with id ${id} not found`, error);
           });
       },
@@ -43,7 +49,7 @@ export class ProductDetailComponent {
   }
 
   addToCart(): void {
-    if (this.product.available > 0) {
+    if (this.product && this.product.available > 0) {
       this.product.available--;
       this.cartSvc.addItem(this.product);
     }

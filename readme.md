@@ -2,7 +2,7 @@
 
 #### SEIS622 Web Development - Spring 2025
 
-![Demo](GigaGarageSale.gif)
+![GigaGarageSale shop page](docs/shop.jpg)
 
 ## Local development
 

@@ -12,7 +12,7 @@ import { ShopComponent } from './shop.component';
 function product(id: number): IProduct {
   return {
     id, title: `Product ${id}`, name: `Product ${id}`, brand: 'ASUS', merchant: 'Dan F', category: 'GPU',
-    price: 10, imageUrl: '/images/1.jpg', descriptions: [], rating: 4, available: 3
+    price: 10, imageUrl: `/images/${id}.jpg`, descriptions: [], rating: 4, available: 3
   };
 }
 

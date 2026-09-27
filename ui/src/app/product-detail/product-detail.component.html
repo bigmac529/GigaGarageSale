@@ -1,4 +1,4 @@
-<main>
+<main *ngIf="product">
   <section id="image">
     <a href="{{product?.imageUrl}}" target="_blank"><img src="{{product?.imageUrl}}" /></a>
   </section>
@@ -31,3 +31,8 @@
     
   </section>
 </main>
+<div class="not-found" *ngIf="notFound">
+  <h2>Product not found</h2>
+  <p>This item is no longer listed on GigaGarageSale.</p>
+  <a [routerLink]="['/shop']">Back to the shop</a>
+</div>

@@ -19,7 +19,7 @@ const catalog: IProduct[] = Array.from({ length: 50 }, (_, i) => ({
   merchant: i % 5 === 0 ? "Bob's Code Cave" : 'Dan F',
   category: i < 20 ? 'GPU' : 'RAM',
   price: 100 - i,
-  imageUrl: `/images/${(i % 11) + 1}.jpg`,
+  imageUrl: `/images/${i + 1}.jpg`,
   descriptions: [],
   rating: (i % 5) + 1,
   available: 5
