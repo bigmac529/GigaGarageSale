@@ -56,7 +56,7 @@ if (-not (Test-Path -LiteralPath $webConfigPath)) {
         <clear />
         <rule name="GigaGarageSaleNode" stopProcessing="true">
           <match url="(.*)" />
-          <action type="Rewrite" url="http://127.0.0.1:$Port/{R:1}" />
+          <action type="Rewrite" url="http://localhost:$Port/{R:1}" />
         </rule>
       </rules>
     </rewrite>
@@ -65,7 +65,7 @@ if (-not (Test-Path -LiteralPath $webConfigPath)) {
   </system.webServer>
 </configuration>
 "@ | Set-Content -LiteralPath $webConfigPath -Encoding UTF8
-  Write-Host "Wrote new web.config -> 127.0.0.1:$Port"
+  Write-Host "Wrote new web.config -> localhost:$Port"
 } else {
   Write-Host "Keeping existing web.config"
 }
@@ -141,10 +141,11 @@ if ($svc.Status -ne "Running") {
 Write-Host "Service status: $($svc.Status)"
 
 Write-Step "Smoke test"
-$health = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/api/health" -UseBasicParsing -TimeoutSec 20
+$health = Invoke-WebRequest -Uri "http://localhost:$Port/api/health" -UseBasicParsing -TimeoutSec 20
 Write-Host ("GET /api/health -> {0} {1}" -f [int]$health.StatusCode, $health.Content)
-$home = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/" -UseBasicParsing -TimeoutSec 20
-Write-Host ("GET / -> {0}" -f [int]$home.StatusCode)
+# $home is a read-only automatic variable in PowerShell, so use another name.
+$homePage = Invoke-WebRequest -Uri "http://localhost:$Port/" -UseBasicParsing -TimeoutSec 20
+Write-Host ("GET / -> {0}" -f [int]$homePage.StatusCode)
 
 Write-Host ""
 Write-Host "POST-DEPLOY OK" -ForegroundColor Green
