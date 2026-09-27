@@ -84,4 +84,27 @@ describe('ShopComponent', () => {
     expect(el.querySelector('.notice-title')?.textContent).toContain('No products found');
     expect(el.querySelector('app-pager')).toBeNull();
   });
+
+  it('filters when a merchant name is clicked', async () => {
+    await harness.navigateByUrl('/shop', ShopComponent);
+    flushStartup();
+    flushPage({ items: [product(1)], total: 1 });
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    (el.querySelector('mat-expansion-panel-header') as HTMLElement).click();
+    harness.detectChanges();
+
+    const name = el.querySelector('.filterOption .filterText') as HTMLElement;
+    expect(name.textContent).toBe('Dan F');
+    const rect = name.getBoundingClientRect();
+    const at = { bubbles: true, cancelable: true, clientX: rect.left + 2, clientY: rect.top + 2, button: 0, detail: 1 };
+    name.dispatchEvent(new MouseEvent('mousedown', at));
+    document.dispatchEvent(new MouseEvent('mouseup', at));
+    name.dispatchEvent(new MouseEvent('click', at));
+    await harness.fixture.whenStable();
+
+    const req = flushPage({ items: [product(1)], total: 1 });
+    expect(req.request.params.get('merchant')).toBe('Dan F');
+    expect(TestBed.inject(Router).url).toBe('/shop?merchant=Dan%20F');
+  });
 });

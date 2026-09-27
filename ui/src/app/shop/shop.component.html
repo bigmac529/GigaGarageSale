@@ -7,7 +7,7 @@
       <mat-expansion-panel-header>Merchants</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div class="filterOption" *ngFor="let merchant of merchants">
-          <label><input type="radio" name="merchant" [value]="merchant" [checked]="same(state.merchant, merchant)" (change)="setFilter('merchant', merchant)" />{{merchant}}</label>
+          <label><input type="radio" name="merchant" [value]="merchant" [checked]="same(state.merchant, merchant)" (change)="setFilter('merchant', merchant)" /><span class="filterText" appOverflowText>{{merchant}}</span></label>
         </div>
       </ng-template>
     </mat-expansion-panel>
@@ -15,7 +15,7 @@
       <mat-expansion-panel-header>Brands</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div class="filterOption" *ngFor="let brand of brands">
-          <label><input type="radio" name="brand" [value]="brand" [checked]="same(state.brand, brand)" (change)="setFilter('brand', brand)" />{{brand}}</label>
+          <label><input type="radio" name="brand" [value]="brand" [checked]="same(state.brand, brand)" (change)="setFilter('brand', brand)" /><span class="filterText" appOverflowText>{{brand}}</span></label>
         </div>
       </ng-template>
     </mat-expansion-panel>
@@ -23,7 +23,7 @@
       <mat-expansion-panel-header>Categories</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div class="filterOption" *ngFor="let category of categories">
-          <label><input type="radio" name="category" [value]="category" [checked]="same(state.category, category)" (change)="setFilter('category', category)" />{{category}}</label>
+          <label><input type="radio" name="category" [value]="category" [checked]="same(state.category, category)" (change)="setFilter('category', category)" /><span class="filterText" appOverflowText>{{category}}</span></label>
         </div>
       </ng-template>
     </mat-expansion-panel>

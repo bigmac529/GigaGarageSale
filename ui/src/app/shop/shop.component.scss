@@ -17,15 +17,43 @@ main {
   height: 100%;
 }
 
-.filter div {
-  padding-left: 10px;
-  margin-top: -1px;
-}
-
 #filterTitle {
   display: flex;
+  margin-top: -1px;
   margin-bottom: 5px;
+  padding-left: 10px;
   width: 200px;
+}
+
+// One option per line, starting flush with the panel heading. Names that don't fit are
+// clipped where the panel ends (the -24px cancels the panel body's right padding);
+// hovering shows the full name and drag-selecting scrolls the rest into view
+// (see OverflowTextDirective).
+.filterOption {
+  margin-right: -24px;
+}
+
+.filterOption label {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.filterOption input {
+  flex: none;
+  margin: 0 5px 0 0;
+}
+
+.filterText {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  // Plain clipping rather than an ellipsis: the text is scrolled while drag-selecting,
+  // and an ellipsis would hide the very characters being revealed.
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 #clearFilters {

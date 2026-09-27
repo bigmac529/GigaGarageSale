@@ -8,6 +8,7 @@ import { IProduct } from '../../../../shared/i-product';
 import { IProductFacets, IProductPage, ProductSort } from '../../../../shared/i-product-page';
 import { ProductsService } from '../shared/products-service';
 import { PagerComponent } from '../pager/pager.component';
+import { OverflowTextDirective } from '../shared/overflow-text.directive';
 
 export const DEFAULT_PAGE_SIZE = 24;
 export const PAGE_SIZES = [12, 24, 48, 96];
@@ -56,7 +57,8 @@ export function readShopState(params: ParamMap): ShopState {
     CommonModule,
     MatExpansionModule,
     RouterModule,
-    PagerComponent
+    PagerComponent,
+    OverflowTextDirective
   ],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
