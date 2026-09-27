@@ -1,17 +1,19 @@
 {
-    "compilerOptions": {
-        "lib": [
-            "es2015"
-        ],
-        "module": "commonjs",
-        "outDir": "dist",
-        "sourceMap": true,
-        "strict": false,
-        "target": "es2015",
-        "strictPropertyInitialization": false,
-        "noImplicitAny": false
-    },
-    "include": [
-        "src"
-    ]
+  "compilerOptions": {
+    "lib": [
+      "es2015"
+    ],
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": false,
+    "target": "es2015",
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "src"
+  ]
 }

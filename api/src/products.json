@@ -5,7 +5,7 @@
         "title": "ASUS Dual NVIDIA GeForce RTX 3050 6GB",
         "brand": "ASUS",
         "price": 100.32,
-        "imageUrl": "http://localhost:3000/images/1.jpg",
+        "imageUrl": "/images/1.jpg",
         "category": "GPU",
         "descriptions": [
             "NVIDIA Ampere Streaming Multiprocessors: The all-new Ampere SM brings 2X the FP32 throughput and improved power efficiency.",
@@ -24,7 +24,7 @@
         "title": "CORSAIR VENGEANCE RGB DDR5 RAM 32GB",
         "brand": "CORSAIR",
         "price": 45.23,
-        "imageUrl": "http://localhost:3000/images/2.jpg",
+        "imageUrl": "/images/2.jpg",
         "category": "RAM",
         "descriptions": [
             "VENGEANCE RGB DDR5 memory is designed for high-performance overclocking on the latest Intel and AMD DDR5 motherboards.",
@@ -43,7 +43,7 @@
         "title": "G.SKILL Trident Z5 RGB Series DDR5 RAM 64GB",
         "brand": "G.SKILL",
         "price": 88.3,
-        "imageUrl": "http://localhost:3000/images/3.jpg",
+        "imageUrl": "/images/3.jpg",
         "category": "RAM",
         "descriptions": [
             "Trident Z5 RGB Series, designed for Intel 700/800 Series Chipset with 13th/14th Gen Intel Core Series CPU or Intel Core Ultra 200 Series CPU",
@@ -65,7 +65,7 @@
         "title": "MSI MAG B760 Tomahawk WiFi Gaming Motherboard",
         "brand": "MSI",
         "price": 67.90,
-        "imageUrl": "http://localhost:3000/images/4.jpg",
+        "imageUrl": "/images/4.jpg",
         "category": "Motherboard",
         "descriptions": [
             "Supports 12th/13th Gen Intel Core, Pentium Gold and Celeron processors for LGA 1700 socket",
@@ -84,7 +84,7 @@
         "title": "ASUS TUF Gaming GeForce RTX 5070 12GB GDDR7 OC Edition",
         "brand": "ASUS",
         "price": 229.10,
-        "imageUrl": "http://localhost:3000/images/5.jpg",
+        "imageUrl": "/images/5.jpg",
         "category": "GPU",
         "descriptions": [
             "Powered by the NVIDIA Blackwell architecture and DLSS 4",
@@ -106,7 +106,7 @@
         "title": "GIGABYTE X870 Eagle WIFI7 AMD AM5 Motherboard",
         "brand": "GIGABYTE",
         "price": 37.30,
-        "imageUrl": "http://localhost:3000/images/6.jpg",
+        "imageUrl": "/images/6.jpg",
         "category": "Motherboard",
         "descriptions": [
             "AMD Socket AM5: Supports AMD Ryzen 9000 / Ryzen 8000 / Ryzen 7000 Series Processors",
@@ -125,7 +125,7 @@
         "title": "PNY T1000 Graphics Card 8GB DDR6",
         "brand": "PNY",
         "price": 93.33,
-        "imageUrl": "http://localhost:3000/images/7.jpg",
+        "imageUrl": "/images/7.jpg",
         "category": "GPU",
         "descriptions": [
             "PNY VCNT1000-8GB-PB. Graphics processor family",
@@ -146,7 +146,7 @@
         "title": "Acer Predator Vest II RGB DDR5 32GB",
         "brand": "Acer",
         "price": 77.8,
-        "imageUrl": "http://localhost:3000/images/8.jpg",
+        "imageUrl": "/images/8.jpg",
         "category": "RAM",
         "descriptions": [
             "High speed & Low latency: Predator Vesta II RGB memory is built with high-quality, hand-screened DDR5 ICs to deliver next-level speeds up to 7200 MHz, unleashing new potential for enthusiasts.",
@@ -165,7 +165,7 @@
         "title": "ASUS ROG Strix B650-A AMD Ryzen 7 Motherboard",
         "brand": "ASUS",
         "price": 74.3,
-        "imageUrl": "http://localhost:3000/images/9.jpg",
+        "imageUrl": "/images/9.jpg",
         "category": "Motherboard",
         "descriptions": [
             "AM5 Socket: Ready for AMD Ryzen Desktop 9000*, 8000*, and 7000 Series Processors",
@@ -184,7 +184,7 @@
         "title": "GAMEMAX 1300W Power Supply ATX 3.0 & PCIE 5.0 Ready",
         "brand": "GAMEMAX",
         "price": 49.1,
-        "imageUrl": "http://localhost:3000/images/10.jpg",
+        "imageUrl": "/images/10.jpg",
         "category": "PSU",
         "descriptions": [
             "80 Plus Platinum Certified: Fully Power supply 1300W with 80 Plus platinum certified, with 92% or higher efficiency under typical loads.",
@@ -203,7 +203,7 @@
         "title": "PCCOOLER CPS YS1200 Power Supply 1200W",
         "brand": "PCCOOLER",
         "price": 109.2,
-        "imageUrl": "http://localhost:3000/images/11.jpg",
+        "imageUrl": "/images/11.jpg",
         "category": "PSU",
         "descriptions": [
             "【80 Plus Gold Certified】 Passed 80 PLUS and Cybenetics gold certification, the conversion efficiency exceeds 91% under typical load conditions, ensuring optimal power utilization and reduced energy consumption.【Notice】Please don't use the other brand cables, only use the cables come with PCCOOLER CPS PSU package.",
