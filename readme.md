@@ -4,6 +4,39 @@
 
 ![Demo](GigaGarageSale.gif)
 
+## Local development
+
+Requires Node 20+ (Angular 19). One-time install (or run `install.cmd` on Windows):
+
+```bash
+cd api && npm install
+cd ../ui && npm install
+```
+
+Run the API and the UI in two terminals (or run `start.cmd` on Windows, which opens both):
+
+```bash
+# terminal 1: API on http://localhost:3106
+cd api
+npm start
+
+# terminal 2: UI on http://localhost:4200
+cd ui
+npm start
+```
+
+Open http://localhost:4200/.
+
+The UI calls the API with relative URLs (`/api/...`, `/images/...`). In production IIS serves both
+from the same site; locally `ng serve` forwards `/api` and `/images` to `http://localhost:3106`
+via `ui/proxy.conf.json`, so the browser never makes a cross-origin request and no CORS setup is
+needed. The API binds every address `localhost` resolves to (IPv6 `::1` and IPv4 `127.0.0.1`), so the
+proxy reaches it whichever one Node picks. If you run the API on another port (`PORT=...`), change
+the `target` in `ui/proxy.conf.json` to match.
+
+If you still see requests to `http://localhost:3000` or a CORS error, you are on an old checkout:
+`git pull` on `main`, then restart both terminals.
+
 ## socha3 hosting
 
 | Piece | Value |

@@ -14,17 +14,23 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const SPA_DIR = path.join(PUBLIC_DIR, 'spa');
 const PRODUCTS_FILE = path.join(__dirname, 'products.json');
 
+// In production the UI and API share one origin (IIS/ARR -> Node), and in local dev
+// `ng serve` proxies /api and /images to this server (ui/proxy.conf.json), so CORS is
+// not normally needed. The ng serve origin is still allowed outside production so a
+// build that calls http://localhost:3106 directly keeps working. Registered before the
+// body parsers so even a 400 from a malformed body carries the CORS headers.
+const corsOrigins = [
+  'https://gigagaragesale.socha3.com',
+  'http://gigagaragesale.socha3.com'
+];
+if (process.env.NODE_ENV !== 'production') {
+  corsOrigins.push('http://localhost:4200');
+}
+app.use(cors({ origin: corsOrigins }));
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
-
-app.use(cors({
-  origin: [
-    'http://localhost:4200',
-    'https://gigagaragesale.socha3.com',
-    'http://gigagaragesale.socha3.com'
-  ]
-}));
 
 app.use('/images', express.static(path.join(PUBLIC_DIR, 'images')));
 app.use(express.static(PUBLIC_DIR));
