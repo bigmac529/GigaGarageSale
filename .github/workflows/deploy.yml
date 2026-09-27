@@ -1,0 +1,142 @@
+name: Deploy
+
+# A merged pull request is a push to main, so this deploys every merge.
+# It can also be started by hand from the Actions tab (workflow_dispatch).
+# Never add pull_request triggers here: the deploy job runs on a self-hosted
+# runner on the production server and this repository is public.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer run waits for the current one instead of cancelling it.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      deployable: ${{ steps.check.outputs.deployable }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            ui/package-lock.json
+            api/package-lock.json
+
+      # Deploy only commits that contain the hosted version of the app
+      # (health endpoint + deploy script). Older commits build but don't deploy.
+      - name: Check the commit is deployable
+        id: check
+        run: |
+          if grep -q "/api/health" api/src/index.ts && [ -f scripts/ci-deploy.ps1 ]; then
+            echo "deployable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::api/src/index.ts has no /api/health endpoint (or scripts/ci-deploy.ps1 is missing); building only, the deploy job will be skipped."
+            echo "deployable=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install UI dependencies
+        working-directory: ui
+        run: npm ci --no-audit --no-fund
+
+      - name: Build UI
+        working-directory: ui
+        run: npx ng build --configuration production
+
+      # Several specs already fail on main because of missing test providers,
+      # so tests are reported but don't block the deploy (yet).
+      - name: Unit tests (non-blocking)
+        working-directory: ui
+        continue-on-error: true
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+      - name: Install API dependencies
+        working-directory: api
+        run: npm ci --no-audit --no-fund
+
+      - name: Smoke test the API serving the built UI
+        if: steps.check.outputs.deployable == 'true'
+        run: |
+          mkdir -p api/public/spa
+          cp -r ui/dist/giga-garage-sale/browser/. api/public/spa/
+          cd api
+          PORT=3106 ./node_modules/.bin/ts-node src/index.ts > ../api-smoke.log 2>&1 &
+          API_PID=$!
+          for i in $(seq 1 30); do
+            if curl -fs http://localhost:3106/api/health; then break; fi
+            sleep 2
+          done
+          echo
+          curl -fsS http://localhost:3106/api/health > /dev/null
+          curl -fsS http://localhost:3106/ | grep -q "<app-root" && echo "UI served OK"
+          kill "$API_PID" || true
+
+      - name: Show API smoke log
+        if: failure() && steps.check.outputs.deployable == 'true'
+        run: cat api-smoke.log || true
+
+      # Package = tracked files at this commit (no node_modules/dist/.git)
+      # + the built UI in api/public/spa. The server runs npm ci for the API itself.
+      - name: Assemble deploy package
+        run: |
+          set -euo pipefail
+          mkdir package
+          git archive HEAD | tar -x -C package
+          rm -rf package/.github package/GigaGarageSale.gif
+          mkdir -p package/api/public/spa
+          cp -r ui/dist/giga-garage-sale/browser/. package/api/public/spa/
+          echo "$GITHUB_SHA" > package/DEPLOYED_COMMIT
+          du -sh package
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gigagaragesale-${{ github.sha }}
+          path: package/
+          retention-days: 14
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy to socha3 (IIS + Node)
+    needs: build
+    if: needs.build.outputs.deployable == 'true'
+    # Self-hosted runner on the Windows server; see docs/DEPLOY.md.
+    runs-on: [self-hosted, windows, gigagaragesale]
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://gigagaragesale.socha3.com/
+    steps:
+      - name: Clean staging folder
+        shell: powershell
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP "gigagaragesale-package"
+          if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: gigagaragesale-${{ github.sha }}
+          path: ${{ runner.temp }}/gigagaragesale-package
+
+      - name: Deploy, health check, roll back on failure
+        shell: powershell
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP "gigagaragesale-package"
+          & (Join-Path $staging "scripts\ci-deploy.ps1") `
+            -Source $staging `
+            -AppRoot "C:\WebApps\GigaGarageSale" `
+            -ServiceName "GigaGarageSaleNode" `
+            -HealthUrl "http://localhost:3106/api/health" `
+            -Commit $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

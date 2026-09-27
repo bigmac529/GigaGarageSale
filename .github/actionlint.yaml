@@ -1,0 +1,4 @@
+self-hosted-runner:
+  # Custom label of the self-hosted Windows runner on the production server (docs/DEPLOY.md).
+  labels:
+    - gigagaragesale
