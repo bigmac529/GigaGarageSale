@@ -1,4 +1,13 @@
 import { IProduct } from '../../shared/i-product';
+import { IProductFacets } from '../../shared/i-product-page';
+import {
+  QueryError,
+  isPagedQuery,
+  filterProducts,
+  pageProducts,
+  parseProductQuery,
+  productFacets
+} from './product-query';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
@@ -12,7 +21,11 @@ const PORT = Number(process.env.PORT) || 3106;
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const SPA_DIR = path.join(PUBLIC_DIR, 'spa');
-const PRODUCTS_FILE = path.join(__dirname, 'products.json');
+// PRODUCTS_FILE lets you point a local API at a different catalog (for example a large
+// generated one when testing pagination) without touching the committed products.json.
+const PRODUCTS_FILE = process.env.PRODUCTS_FILE
+  ? path.resolve(process.env.PRODUCTS_FILE)
+  : path.join(__dirname, 'products.json');
 
 // In production the UI and API share one origin (IIS/ARR -> Node), and in local dev
 // `ng serve` proxies /api and /images to this server (ui/proxy.conf.json), so CORS is
@@ -39,11 +52,13 @@ if (fs.existsSync(SPA_DIR)) {
 }
 
 let products: IProduct[] = [];
+let facets: IProductFacets = { merchants: [], brands: [], categories: [] };
 
 function resetProducts() {
   try {
     const raw = fs.readFileSync(PRODUCTS_FILE, 'utf8');
     products = JSON.parse(raw);
+    facets = productFacets(products);
   } catch (err) {
     console.error(`Unable to read file: ${PRODUCTS_FILE}`, err);
   }
@@ -61,8 +76,36 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-app.get('/api/products', (_req, res) => {
-  return res.status(200).json(products);
+/**
+ * GET /api/products
+ *
+ * Optional filters: q (search), merchant, brand, category, sort
+ * (featured | price-asc | price-desc | rating-desc | title-asc).
+ *
+ * With page and/or pageSize (default 24, max 100) the response is a page:
+ *   { items, total, page, pageSize, totalPages }
+ * Pagination applies after filtering and sorting. Without either parameter the response
+ * is the plain array of every matching product, as before, so older callers keep working.
+ */
+app.get('/api/products', (req, res) => {
+  let query;
+  try {
+    query = parseProductQuery(req.query as Record<string, unknown>);
+  } catch (err) {
+    if (err instanceof QueryError) {
+      return res.status(400).json({ message: err.message });
+    }
+    throw err;
+  }
+  if (isPagedQuery(query)) {
+    return res.status(200).json(pageProducts(products, query));
+  }
+  return res.status(200).json(filterProducts(products, query));
+});
+
+/** GET /api/products/facets: distinct merchants, brands and categories for the filter panel. */
+app.get('/api/products/facets', (_req, res) => {
+  return res.status(200).json(facets);
 });
 
 app.get('/api/products/:id', (req, res) => {

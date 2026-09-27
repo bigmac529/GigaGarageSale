@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet, RouterModule, Router, Params } from '@angular/router';
+import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, startWith, switchMap } from 'rxjs/operators';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { IProduct } from '../../../shared/i-product';
@@ -31,49 +31,70 @@ import { ShoppingCartService } from './shared/shopping-cart-service';
 })
 export class AppComponent implements OnInit {
   title = 'GigaGarageSale';
-  txtSearch = new FormControl('');
-  options: IProduct[] = [];
+  txtSearch = new FormControl<string | IProduct>('');
   filteredOptions: Observable<IProduct[]>;
   router: Router = inject(Router);
   productsSvc: ProductsService = inject(ProductsService);
   cartSvc: ShoppingCartService = inject(ShoppingCartService);
 
   ngOnInit() {
-    this.productsSvc.products$
-      .then((products: IProduct[]) => {
-        this.options = products;
-      })
-      .catch((err: any) => {
-        console.error('Could not load products.', err);
-      });
-
+    // Suggestions come from the server (search runs there), so the catalog is never
+    // downloaded in full.
     this.filteredOptions = this.txtSearch.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value || '')),
+      map(value => typeof value === 'string' ? value.trim() : ''),
+      debounceTime(150),
+      distinctUntilChanged(),
+      switchMap(text => this.productsSvc.search(text).pipe(
+        catchError(err => {
+          console.error('Could not load search suggestions.', err);
+          return of([] as IProduct[]);
+        })
+      ))
     );
 
-    // Reset search text box when navigating to a new product
-    this.router.events.subscribe({
-      next: (params: Params) => {
+    // Reset search text box after navigating (to a product, or to search results)
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe({
+      next: () => {
         this.txtSearch.setValue('');
       }
     });
+  }
+
+  displayTitle(product: IProduct | string | null): string {
+    return typeof product === 'string' ? product : product?.title ?? '';
+  }
+
+  /** Choosing a suggestion opens that product. */
+  public selectSuggestion(event: MatAutocompleteSelectedEvent) {
+    this.navigateProduct((event.option.value as IProduct).id);
   }
 
   public navigateProduct(id: number) {
     this.router.navigate(['/product-detail', id]);
   }
 
-  private _filter(value: string): IProduct[] {
-    const filterValue = value.toLowerCase();
-
-    let retVal: IProduct[] = [];
-    for (let i = 0; i < this.options.length; i++) {
-      if (this.options[i].title.toLowerCase().includes(filterValue)) {
-        retVal.push(this.options[i]);
+  /** Enter without a highlighted suggestion shows every match on the shop page (page 1). */
+  public searchAll(trigger: MatAutocompleteTrigger) {
+    const value = this.txtSearch.value;
+    if (trigger.activeOption || typeof value !== 'string') {
+      return;
+    }
+    trigger.closePanel();
+    // A header search starts a fresh result list: filters and page reset, but the
+    // shopper's sort and page-size choices are kept if they are already on the shop.
+    const current = this.router.parseUrl(this.router.url);
+    const onShop = current.root.children['primary']?.segments[0]?.path === 'shop';
+    const queryParams: Record<string, string> = {};
+    for (const key of onShop ? ['sort', 'pageSize'] : []) {
+      if (current.queryParams[key]) {
+        queryParams[key] = current.queryParams[key];
       }
     }
-
-    return retVal;
+    const q = value.trim();
+    if (q) {
+      queryParams['q'] = q;
+    }
+    this.router.navigate(['/shop'], { queryParams });
   }
 }

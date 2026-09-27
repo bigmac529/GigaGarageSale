@@ -14,11 +14,13 @@
     <div id="searchIcon"></div>
     <div>
       <mat-form-field>
-        <input id="txtSearch" matInput type="text" placeholder="Search product" [formControl]="txtSearch" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option.title" (click)="navigateProduct(option.id)" style="font-size:9pt;background-color: white;">
+        <input id="txtSearch" matInput type="text" enterkeyhint="search" placeholder="Search product" aria-label="Search products"
+               [formControl]="txtSearch" [matAutocomplete]="auto" #trigger="matAutocompleteTrigger"
+               (keydown.enter)="searchAll(trigger)">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTitle" (optionSelected)="selectSuggestion($event)">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option" style="font-size:9pt;background-color: white;">
             {{option.title}}
-          </mat-option>                   
+          </mat-option>
         </mat-autocomplete>
       </mat-form-field>
     </div>

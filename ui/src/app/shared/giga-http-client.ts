@@ -1,7 +1,8 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { IProduct } from "../../../../shared/i-product";
-import { Observable } from "rxjs/internal/Observable";
+import { IProductFacets, IProductPage, IProductQuery } from "../../../../shared/i-product-page";
+import { Observable } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class GigaHttpClient {
@@ -10,13 +11,27 @@ export class GigaHttpClient {
   readonly apiBaseUrl: string = `${this.hostUrl}/api`;
 
   httpClient: HttpClient = inject(HttpClient);
-  constructor() {
+
+  /**
+   * Retrieve one page of products. Search, filters and sort are applied on the server
+   * before paginating.
+   */
+  getProductPage(query: IProductQuery): Observable<IProductPage> {
+    const url = `${this.apiBaseUrl}/products`;
+    let params = new HttpParams()
+      .set('page', String(query.page ?? 1));
+    for (const key of ['pageSize', 'q', 'merchant', 'brand', 'category', 'sort'] as const) {
+      const value = query[key];
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    }
+    return this.httpClient.get<IProductPage>(url, { params });
   }
 
-  getProducts(): Observable<IProduct[]> {
-    const url = `${this.apiBaseUrl}/products`;
-    console.log(`Getting products from ${url}`);
-    return this.httpClient.get<IProduct[]>(url);
+  /** Distinct merchants, brands and categories for the shop filters. */
+  getProductFacets(): Observable<IProductFacets> {
+    return this.httpClient.get<IProductFacets>(`${this.apiBaseUrl}/products/facets`);
   }
 
   /**
