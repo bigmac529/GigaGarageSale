@@ -1,3 +1,5 @@
+@use '../shared/breakpoints' as bp;
+
 main {
   margin: 40px;
   display: flex;
@@ -92,4 +94,76 @@ img {
   font-size: 16pt;
   margin-right: 20px;
   vertical-align: middle;
+}
+
+// Let the image shrink and the details wrap instead of overflowing.
+@media (max-width: bp.$tablet) {
+  main {
+    margin: 20px;
+  }
+
+  #image {
+    flex: 0 0 40%;
+  }
+
+  #details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #primaryDetails {
+    flex-wrap: wrap;
+  }
+}
+
+// Phones: image on top, details stacked underneath.
+@media (max-width: bp.$phone) {
+  main {
+    flex-direction: column;
+    margin: 15px;
+  }
+
+  #image {
+    flex: none;
+    text-align: center;
+  }
+
+  #details {
+    padding: 10px 0;
+  }
+
+  #name {
+    margin-top: 0;
+  }
+
+  #primaryDetailsAttributes {
+    width: auto;
+    margin-top: 10px;
+    padding-left: 0;
+  }
+
+  #rating {
+    width: auto;
+  }
+
+  #retail {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #addToCart {
+    margin-left: 0;
+  }
+
+  #addToCart button {
+    padding: 0 16px;
+    font-size: 16px;
+  }
+}
+
+@media (pointer: coarse) {
+  #addToCart button {
+    min-height: 44px;
+  }
 }

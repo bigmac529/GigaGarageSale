@@ -1,0 +1,6 @@
+// Shared responsive breakpoints.
+// The desktop layout is a fixed 1000px frame (plus its 2px double border), so
+// anything narrower than that switches to the fluid layout. Phones get an
+// additional stacked / single-column treatment.
+$tablet: 1003px;
+$phone: 640px;
