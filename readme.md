@@ -20,12 +20,14 @@ Run the API and the UI in two terminals (or run `start.cmd` on Windows, which op
 cd api
 npm start
 
-# terminal 2: UI on http://localhost:4200
+# terminal 2: UI on http://localhost:4200 (opens it in your browser)
 cd ui
 npm start
 ```
 
-Open http://localhost:4200/.
+`npm start` in `ui` runs `ng serve --open`, which opens http://localhost:4200/ in your default
+browser once the build is ready (`start.cmd` does the same). Use `npx ng serve` if you don't want a
+browser window.
 
 The UI calls the API with relative URLs (`/api/...`, `/images/...`). In production IIS serves both
 from the same site; locally `ng serve` forwards `/api` and `/images` to `http://localhost:3106`
