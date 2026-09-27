@@ -1,3 +1,97 @@
+@use '../shared/breakpoints' as bp;
+
+$brand: rgb(29, 176, 249);
+$brand-dark: rgb(24, 145, 198);
+$border: rgb(221, 221, 221);
+$muted: rgb(110, 110, 110);
+
 main {
   padding: 20px;
+}
+
+// Project links: two cards side by side on desktop, stacked full width on phones.
+.link-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+a.link-card,
+a.link-card:link,
+a.link-card:visited {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 280px;
+  box-sizing: border-box;
+  min-height: 64px;
+  padding: 14px 18px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: white;
+  color: black;
+  text-decoration: none;
+  transition: border-color .15s, background-color .15s;
+}
+
+a.link-card:hover,
+a.link-card:focus-visible {
+  border-color: $brand;
+  background: rgba(29, 176, 249, .08);
+  color: black;
+}
+
+a.link-card:focus-visible {
+  outline: 2px solid $brand-dark;
+  outline-offset: 2px;
+}
+
+.icon {
+  flex: none;
+  color: $brand-dark;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.url {
+  color: $muted;
+  font-size: .9em;
+  overflow-wrap: anywhere;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: bp.$tablet) {
+  main {
+    padding: 15px;
+  }
+}
+
+@media (max-width: bp.$phone) {
+  .link-cards {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  a.link-card,
+  a.link-card:link,
+  a.link-card:visited {
+    flex: none;
+    width: 100%;
+  }
 }

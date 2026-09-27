@@ -96,6 +96,11 @@ img {
   vertical-align: middle;
 }
 
+.not-found {
+  padding: 40px 20px;
+  text-align: center;
+}
+
 // Let the image shrink and the details wrap instead of overflowing.
 @media (max-width: bp.$tablet) {
   main {

@@ -124,7 +124,9 @@ app.post('/api/products/reset', (_req, res) => {
 });
 
 app.get('/{*splat}', (req, res, next) => {
-  if (req.path.startsWith('/api/')) {
+  // A missing API route or image (e.g. /images/1.jpg for a removed product) is a real 404,
+  // not the SPA shell.
+  if (req.path.startsWith('/api/') || req.path.startsWith('/images/')) {
     return next();
   }
   const indexPath = path.join(SPA_DIR, 'index.html');
