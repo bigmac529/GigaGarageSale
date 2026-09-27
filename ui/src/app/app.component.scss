@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use './shared/breakpoints' as bp;
 
 header {
   display: flex;
@@ -75,4 +76,86 @@ nav app-fade-out-text {
   margin-top: 10px;
   color: white;
   font-weight: bold;
+}
+
+// Narrower than the desktop frame: let the header items share the space
+// instead of using fixed offsets.
+@media (max-width: bp.$tablet) {
+  header {
+    align-items: center;
+  }
+
+  nav {
+    flex: 1;
+    width: auto;
+    padding: 0 10px;
+    text-align: center;
+  }
+
+  #search {
+    padding-left: 0;
+  }
+
+  // 16px keeps iOS Safari from zooming in when the field is focused.
+  #search input {
+    font-size: 16px;
+  }
+
+  #cart {
+    margin-left: 20px;
+  }
+}
+
+// Phones: logo / nav / cart on the first row, full-width search below.
+@media (max-width: bp.$phone) {
+  header {
+    flex-wrap: wrap;
+  }
+
+  #logo img {
+    height: 48px;
+  }
+
+  nav {
+    font-size: 1.1em;
+    padding: 0;
+  }
+
+  #search {
+    order: 1;
+    flex-basis: 100%;
+    box-sizing: border-box;
+    padding: 0 10px 5px;
+  }
+
+  #search > div:last-child,
+  #search mat-form-field {
+    flex: 1;
+    width: 100%;
+  }
+
+  #search input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #cart {
+    margin: 0;
+    width: 48px;
+    height: 48px;
+    background-size: contain;
+  }
+
+  #numCartItems {
+    align-self: flex-start;
+    margin-top: 5px;
+  }
+}
+
+// Touch screens: bigger tap targets for the nav links.
+@media (pointer: coarse) {
+  nav a {
+    display: inline-block;
+    padding: 11px 4px;
+  }
 }

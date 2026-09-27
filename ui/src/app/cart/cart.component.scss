@@ -1,3 +1,5 @@
+@use '../shared/breakpoints' as bp;
+
 h2 {
   text-align: center;
   margin-top: 10px;
@@ -43,4 +45,28 @@ table {
 
 #checkout button:hover {
   background-color: rgb(24, 145, 198);
+}
+
+// Phones: use the full width and tighten the table so all columns fit.
+@media (max-width: bp.$phone) {
+  table {
+    width: calc(100% - 10px);
+    border-collapse: collapse;
+    font-size: .85em;
+  }
+
+  th, td {
+    padding: 4px 2px;
+  }
+
+  .remove {
+    margin: 0;
+    font-size: inherit;
+  }
+}
+
+@media (pointer: coarse) {
+  .remove {
+    min-height: 44px;
+  }
 }

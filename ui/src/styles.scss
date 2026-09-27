@@ -1,3 +1,4 @@
+@use 'app/shared/breakpoints' as bp;
 
 body {
     width: 1000px;
@@ -12,6 +13,7 @@ body {
 }
 
 footer {
+  box-sizing: border-box;
   width: 100%;
   text-align: center;
   padding: 10px;
@@ -31,4 +33,24 @@ a:hover {
 
 a:active {
   color: black;
+}
+
+// Fluid layout once the fixed 1000px desktop frame no longer fits the viewport.
+@media (max-width: bp.$tablet) {
+  body {
+    width: auto;
+    margin: 10px;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: bp.$phone) {
+  body {
+    margin: 0;
+    border-width: 0;
+    border-radius: 0;
+  }
 }

@@ -1,3 +1,5 @@
+@use '../shared/breakpoints' as bp;
+
 main {
   display: flex;
 }
@@ -85,4 +87,62 @@ main {
 
 a {
   cursor: pointer
+}
+
+@media (max-width: bp.$tablet) {
+  #products {
+    flex: 1;
+    width: auto;
+  }
+}
+
+// Phones: filters stack above a two-column product grid.
+@media (max-width: bp.$phone) {
+  main {
+    flex-direction: column;
+  }
+
+  .filter {
+    width: auto;
+    margin: 10px;
+  }
+
+  #filterTitle {
+    width: auto;
+    align-items: center;
+  }
+
+  #products {
+    margin: 0 5px 10px;
+  }
+
+  .product {
+    box-sizing: border-box;
+    width: calc(50% - 10px);
+    height: auto;
+    margin: 5px;
+  }
+
+  .productImageDiv {
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .productImage {
+    width: 100%;
+  }
+}
+
+// Touch screens: make "(clear)" and the filter options easy to tap.
+@media (pointer: coarse) {
+  #clearFilters {
+    padding: 10px;
+    margin-top: 0;
+  }
+
+  .filter label {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }

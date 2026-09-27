@@ -7,8 +7,7 @@
       <mat-expansion-panel-header>Merchants</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div id="merchantFilter" *ngFor="let merchant of merchants">
-          <input type="radio" name="filter" [value]="merchant" id="merchant" [(ngModel)]="merchantFilter" /><label
-            [for]="merchant">{{merchant}}</label>
+          <label><input type="radio" name="filter" [value]="merchant" [(ngModel)]="merchantFilter" />{{merchant}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
@@ -16,8 +15,7 @@
       <mat-expansion-panel-header>Brands</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div id="brandFilter" *ngFor="let brand of brands">
-          <input type="radio" name="filter" [value]="brand" id="brand" [(ngModel)]="brandFilter" /><label
-            [for]="brand">{{brand}}</label>
+          <label><input type="radio" name="filter" [value]="brand" [(ngModel)]="brandFilter" />{{brand}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
@@ -25,8 +23,7 @@
       <mat-expansion-panel-header>Categories</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
         <div id="categoryFilter" *ngFor="let category of categories">
-          <input type="radio" name="filter" [value]="category" id="category" [(ngModel)]="categoryFilter" /><label
-            [for]="category">{{category}}</label>
+          <label><input type="radio" name="filter" [value]="category" [(ngModel)]="categoryFilter" />{{category}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
