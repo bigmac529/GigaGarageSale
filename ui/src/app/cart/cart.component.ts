@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { ShoppingCartService } from '../shared/shopping-cart-service';
+import { IShoppingCartItem } from '../shared/i-shopping-cart-item';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +21,26 @@ export class CartComponent {
   readonly productSvc: ShoppingCartService = inject(ShoppingCartService);
   readonly dialog = inject(MatDialog);
   readonly router = inject(Router);
+
+  /** Adds one more of the item, respecting stock (same rule as the product page). */
+  increase(item: IShoppingCartItem): void {
+    if (item.product.available > 0) {
+      item.product.available--;
+      this.cartSvc.addItem(item.product);
+    }
+  }
+
+  /** Removes one unit; the line disappears when it reaches zero. */
+  decrease(item: IShoppingCartItem): void {
+    this.cartSvc.removeItem(item.product);
+  }
+
+  /** Removes the whole line, returning every unit to stock. */
+  removeLine(item: IShoppingCartItem): void {
+    for (let i = item.quantity; i > 0; i--) {
+      this.cartSvc.removeItem(item.product);
+    }
+  }
 
   checkout(): void {
     let enterAnimationDuration = '1000ms';
