@@ -2,6 +2,7 @@ import { IProduct } from '../../shared/i-product';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
+import dns from 'dns';
 import express from 'express';
 import cors from 'cors';
 
@@ -84,7 +85,47 @@ app.get('/{*splat}', (req, res, next) => {
   return res.status(404).send('GigaGarageSale UI not built yet. Run post-deploy / ng build.');
 });
 
-const server = http.createServer(app);
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`GigaGarageSale API listening on http://127.0.0.1:${PORT}`);
+// Listen on every address HOST resolves to. For "localhost" that is normally both
+// the IPv6 (::1) and IPv4 loopback, so IIS/ARR and health checks work whichever one
+// Windows picks when it resolves "localhost". Loopback only: not reachable from
+// other machines.
+const HOST = process.env.HOST || 'localhost';
+
+dns.lookup(HOST, { all: true }, (err, results) => {
+  if (err || !results || results.length === 0) {
+    console.error(`Could not resolve ${HOST}`, err);
+    process.exit(1);
+  }
+
+  const seen = new Set<string>();
+  const addresses = results.filter(r => !seen.has(r.address) && seen.add(r.address));
+  let pending = addresses.length;
+  let listening = 0;
+
+  const done = () => {
+    if (--pending === 0 && listening === 0) {
+      console.error(`GigaGarageSale API could not listen on ${HOST}:${PORT}`);
+      process.exit(1);
+    }
+  };
+
+  for (const { address, family } of addresses) {
+    const label = family === 6 ? `[${address}]` : address;
+    const server = http.createServer(app);
+    server.on('error', (e: NodeJS.ErrnoException) => {
+      // A missing address family (e.g. IPv6 disabled) is fine as long as one address works;
+      // anything else, such as the port already being in use, is fatal.
+      if (e.code === 'EADDRNOTAVAIL' || e.code === 'EAFNOSUPPORT') {
+        console.warn(`Skipping ${label}:${PORT} (${e.code})`);
+        return done();
+      }
+      console.error(`Could not listen on ${label}:${PORT}`, e);
+      process.exit(1);
+    });
+    server.listen({ port: PORT, host: address, ipv6Only: family === 6 }, () => {
+      listening++;
+      console.log(`GigaGarageSale API listening on http://${label}:${PORT} (${HOST})`);
+      done();
+    });
+  }
 });

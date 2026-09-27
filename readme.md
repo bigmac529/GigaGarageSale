@@ -10,7 +10,7 @@
 | --- | --- |
 | Public URL | https://gigagaragesale.socha3.com/ |
 | Content | `C:\WebApps\GigaGarageSale` |
-| Node listen | `127.0.0.1:3106` (`PORT` env) |
+| Node listen | `localhost:3106` (`PORT` / `HOST` env; binds every loopback address `localhost` resolves to, IPv6 and IPv4) |
 | WinSW | `GigaGarageSaleNode` (runs `api` via ts-node) |
 | IIS | Site/pool `GigaGarageSale`, ARR to Node |
 
