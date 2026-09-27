@@ -10,7 +10,7 @@ Every merge to `main` deploys the app to https://gigagaragesale.socha3.com/ thro
 | Node | `localhost:3106` (`PORT` env), WinSW service `GigaGarageSaleNode` |
 | Health check | http://localhost:3106/api/health |
 | Backups | `C:\WebApps\_deploy-backups\GigaGarageSale\<timestamp>` (last 5 kept) |
-| Runner | self-hosted Windows runner on the server, labels `self-hosted, windows, gigagaragesale` |
+| Runner | self-hosted Windows runner on the server in `C:\actions-runner-gigagaragesale`, labels `self-hosted, windows, gigagaragesale` |
 
 ## How it works
 
@@ -58,15 +58,18 @@ New-Item -ItemType Directory -Force "C:\WebApps\_deploy-backups" | Out-Null
 icacls "C:\WebApps\GigaGarageSale" /grant "gha-gigagaragesale:(OI)(CI)M" /T
 icacls "C:\WebApps\_deploy-backups" /grant "gha-gigagaragesale:(OI)(CI)M" /T
 
-# Service rights: query, start, stop GigaGarageSaleNode
+# Service rights: query, start, stop GigaGarageSaleNode (back up the original SDDL first)
 $sid  = (New-Object System.Security.Principal.NTAccount "gha-gigagaragesale").Translate(
           [System.Security.Principal.SecurityIdentifier]).Value
 $sddl = (sc.exe sdshow GigaGarageSaleNode | Where-Object { $_ }) -join ""
-$new  = $sddl.Insert($sddl.IndexOf("D:") + 2, "(A;;CCLCSWRPWPDTLOCRRC;;;$sid)")
+Set-Content "C:\WebApps\_deploy-backups\GigaGarageSaleNode-sddl-original.txt" $sddl
+$new  = $sddl.Insert($sddl.IndexOf("D:") + 2, "(A;;CCLCSWRPWPLORC;;;$sid)")
 sc.exe sdset GigaGarageSaleNode $new
 ```
 
 Check it by running `sc.exe sdshow GigaGarageSaleNode`. The output should now include an ACE with the account's SID.
+
+On socha3 the ACE actually granted is `(A;;CCLCSWRPWPLORC;;;SID)`: query config/status, enumerate dependents, start, stop, interrogate and read permissions only, with no pause/continue or custom controls. That is all the deploy needs (`Get-Service`, `Stop-Service`, `Start-Service` and waiting for the status). The original SDDL is backed up at `C:\WebApps\_deploy-backups\GigaGarageSaleNode-sddl-original.txt`. To undo the grant, run `sc.exe sdset GigaGarageSaleNode (Get-Content C:\WebApps\_deploy-backups\GigaGarageSaleNode-sddl-original.txt)`.
 
 Node (`C:\Program Files\nodejs`) and WinSW (`C:\Tools\WinSW`) only need the default read/execute access for users.
 
@@ -74,18 +77,20 @@ Node (`C:\Program Files\nodejs`) and WinSW (`C:\Tools\WinSW`) only need the defa
 
 ### 2. Install and register the runner as a service
 
+The runner lives in `C:\actions-runner-gigagaragesale`, not the default `C:\actions-runner`: the server hosts runners for several apps, so each one gets its own folder.
+
 1. Get a registration token: GitHub → **bigmac529/GigaGarageSale → Settings → Actions → Runners → New self-hosted runner → Windows**. Copy the token from the `config.cmd` line; it's valid for 1 hour. From any machine with the GitHub CLI you can use `gh api -X POST repos/bigmac529/GigaGarageSale/actions/runners/registration-token --jq .token` instead.
 2. Download and unpack the runner. The same page shows the current version and its SHA-256 checksum.
 
    ```powershell
    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-   New-Item -ItemType Directory -Force C:\actions-runner | Out-Null
-   Set-Location C:\actions-runner
+   New-Item -ItemType Directory -Force C:\actions-runner-gigagaragesale | Out-Null
+   Set-Location C:\actions-runner-gigagaragesale
    $ver = "2.337.0"
    Invoke-WebRequest -UseBasicParsing -OutFile "runner.zip" `
      "https://github.com/actions/runner/releases/download/v$ver/actions-runner-win-x64-$ver.zip"
    Add-Type -AssemblyName System.IO.Compression.FileSystem
-   [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\actions-runner\runner.zip", "C:\actions-runner")
+   [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\actions-runner-gigagaragesale\runner.zip", "C:\actions-runner-gigagaragesale")
    ```
 
 3. Configure it as a Windows service with the `gigagaragesale` label. `self-hosted`, `Windows` and `X64` are added automatically.
@@ -99,9 +104,9 @@ Node (`C:\Program Files\nodejs`) and WinSW (`C:\Tools\WinSW`) only need the defa
 
    For an unattended setup, add `--unattended --windowslogonaccount ".\gha-gigagaragesale" --windowslogonpassword "<password>"`.
 
-   `config.cmd` gives the account the "Log on as a service" right and access to `C:\actions-runner`.
+   `config.cmd` gives the account the "Log on as a service" right and access to `C:\actions-runner-gigagaragesale`.
 4. Verify:
-   - `Get-Service "actions.runner.*"` shows it **Running**.
+   - `Get-Service "actions.runner.bigmac529-GigaGarageSale.*"` shows it **Running**. The other apps' runners have their own `actions.runner.*` services.
    - GitHub → Settings → Actions → Runners shows `socha3-gigagaragesale` as **Idle**, with labels `self-hosted`, `Windows`, `X64`, `gigagaragesale`.
 
 ### 3. Lock down Actions (the repository is public)
@@ -160,4 +165,4 @@ After a deploy, `C:\WebApps\GigaGarageSale\DEPLOYED_COMMIT` contains the commit 
 - **Deploy job stuck on "Waiting for a runner"**: the runner service is stopped, or its labels don't include `gigagaragesale`.
 - **Access denied** on robocopy, npm or the service: recheck the `icacls` and `sc.exe sdset` steps for the runner account.
 - **"Port 3106 is still in use"**: a stray `node.exe` is holding the port. Find it with `Get-NetTCPConnection -LocalPort 3106 -State Listen` and stop it, then re-run the deploy.
-- **Logs**: the Actions run log, the WinSW service logs, and `C:\actions-runner\_diag` for the runner itself.
+- **Logs**: the Actions run log, the WinSW service logs, and `C:\actions-runner-gigagaragesale\_diag` for the runner itself.
