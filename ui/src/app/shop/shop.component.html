@@ -1,47 +1,112 @@
 <img src="/assets/banner.png" />
 <main>
   <aside class="filter">
-    <div id="filterTitle">Filters: <div id="clearFilters" (click)="clearFilters()">(clear)</div>
+    <div id="filterTitle">Filters: <button type="button" id="clearFilters" (click)="clearFilters()">(clear)</button>
     </div>
     <mat-expansion-panel>
       <mat-expansion-panel-header>Merchants</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
-        <div id="merchantFilter" *ngFor="let merchant of merchants">
-          <label><input type="radio" name="filter" [value]="merchant" [(ngModel)]="merchantFilter" />{{merchant}}</label>
+        <div class="filterOption" *ngFor="let merchant of merchants">
+          <label><input type="radio" name="merchant" [value]="merchant" [checked]="same(state.merchant, merchant)" (change)="setFilter('merchant', merchant)" />{{merchant}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
     <mat-expansion-panel>
       <mat-expansion-panel-header>Brands</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
-        <div id="brandFilter" *ngFor="let brand of brands">
-          <label><input type="radio" name="filter" [value]="brand" [(ngModel)]="brandFilter" />{{brand}}</label>
+        <div class="filterOption" *ngFor="let brand of brands">
+          <label><input type="radio" name="brand" [value]="brand" [checked]="same(state.brand, brand)" (change)="setFilter('brand', brand)" />{{brand}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
     <mat-expansion-panel>
       <mat-expansion-panel-header>Categories</mat-expansion-panel-header>
       <ng-template matExpansionPanelContent>
-        <div id="categoryFilter" *ngFor="let category of categories">
-          <label><input type="radio" name="filter" [value]="category" [(ngModel)]="categoryFilter" />{{category}}</label>
+        <div class="filterOption" *ngFor="let category of categories">
+          <label><input type="radio" name="category" [value]="category" [checked]="same(state.category, category)" (change)="setFilter('category', category)" />{{category}}</label>
         </div>
       </ng-template>
     </mat-expansion-panel>
   </aside>
 
-  <section id="products">
-    <div [class]="'product'" *ngFor="let product of filteredProducts">
-      <a [routerLink]="['/product-detail', product.id]">
-        <div [class]="'productImageDiv'">
-          <img [class]="'productImage'" src="{{product.imageUrl}}" />
-        </div>
-      </a>
-      <div [class]="'productTitle'"><a [routerLink]="['/product-detail', product.id]">{{product.title}}</a></div>
-      <div [class]="'productBrandMerchant'">{{product.category}} / {{product.brand}} ({{product.merchant}})</div>
-      <div style="display:flex">      
-        <div [class]="'productPrice'">{{product.price | currency: 'USD'}}</div>
-        <div [class]="'productAvailability'" *ngIf="product.available == 0" [class]="'productAvailability'">(out of stock)</div>
-      </div>
+  <section class="results" [class.loading]="loading && !!result" [attr.aria-busy]="loading">
+    <div class="toolbar">
+      <p class="count">
+        @if (result) {
+          {{ result.total | number }} {{ result.total === 1 ? 'product' : 'products' }}
+        }
+      </p>
+      <label class="select">
+        <span>Sort</span>
+        <select [value]="state.sort" (change)="setSort($any($event.target).value)">
+          @for (s of sorts; track s.value) {
+            <option [value]="s.value" [selected]="s.value === state.sort">{{ s.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="select">
+        <span>Per page</span>
+        <select [value]="state.pageSize" (change)="setPageSize($any($event.target).value)">
+          @for (size of pageSizes; track size) {
+            <option [value]="size" [selected]="size === state.pageSize">{{ size }}</option>
+          }
+        </select>
+      </label>
     </div>
+
+    @if (hasFilters) {
+      <ul class="chips" aria-label="Active filters">
+        @if (state.q) {
+          <li><button type="button" (click)="setFilter('q', '')" [attr.aria-label]="'Remove search ' + state.q">“{{ state.q }}” <span aria-hidden="true">✕</span></button></li>
+        }
+        @if (state.merchant) {
+          <li><button type="button" (click)="setFilter('merchant', '')" [attr.aria-label]="'Remove merchant ' + state.merchant">{{ state.merchant }} <span aria-hidden="true">✕</span></button></li>
+        }
+        @if (state.brand) {
+          <li><button type="button" (click)="setFilter('brand', '')" [attr.aria-label]="'Remove brand ' + state.brand">{{ state.brand }} <span aria-hidden="true">✕</span></button></li>
+        }
+        @if (state.category) {
+          <li><button type="button" (click)="setFilter('category', '')" [attr.aria-label]="'Remove category ' + state.category">{{ state.category }} <span aria-hidden="true">✕</span></button></li>
+        }
+      </ul>
+    }
+
+    @if (error) {
+      <div class="notice">
+        <p class="notice-title">Couldn't load products</p>
+        <p>Check your connection and try again.</p>
+        <button type="button" class="btn-primary" (click)="reload()">Try again</button>
+      </div>
+    } @else if (!result) {
+      <p class="status">Loading products…</p>
+    } @else if (result.total === 0) {
+      <div class="notice">
+        <img src="/assets/search.png" alt="" />
+        <p class="notice-title">No products found</p>
+        <p>Try removing a filter or searching for something else.</p>
+        <button type="button" class="btn-primary" (click)="clearFilters()">Clear filters</button>
+      </div>
+    } @else {
+      <div id="products">
+        @for (product of products; track product.id) {
+          <div class="product">
+            <a [routerLink]="['/product-detail', product.id]">
+              <div class="productImageDiv">
+                <img class="productImage" [src]="product.imageUrl" [alt]="product.title" loading="lazy" />
+              </div>
+            </a>
+            <div class="productTitle"><a [routerLink]="['/product-detail', product.id]">{{product.title}}</a></div>
+            <div class="productBrandMerchant">{{product.category}} / {{product.brand}} ({{product.merchant}})</div>
+            <div style="display:flex">
+              <div class="productPrice">{{product.price | currency: 'USD'}}</div>
+              @if (product.available == 0) {
+                <div class="productAvailability">(out of stock)</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <app-pager [page]="result.page" [pageSize]="result.pageSize" [total]="result.total" [totalPages]="result.totalPages" />
+    }
   </section>
 </main>

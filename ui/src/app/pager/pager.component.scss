@@ -1,0 +1,117 @@
+// Matches the cart page's look (same brand colour, borders, radius and shadow).
+$brand: rgb(29, 176, 249);
+$brand-dark: rgb(24, 145, 198);
+$border: rgb(221, 221, 221);
+$muted: rgb(110, 110, 110);
+$radius: 8px;
+$shadow: 0 1px 3px rgba(0, 0, 0, .08);
+
+:host {
+  display: block;
+}
+
+.pager {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0 8px;
+}
+
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.num, .step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid $border;
+  border-radius: $radius;
+  background: white;
+  box-shadow: $shadow;
+  color: black;
+  font-size: .9em;
+  font-weight: 600;
+  text-decoration: none;
+  user-select: none;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+
+.step {
+  gap: 6px;
+}
+
+.step span[aria-hidden] {
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+a.num:hover, a.step:hover {
+  border-color: $brand;
+  color: $brand-dark;
+}
+
+a:focus-visible {
+  outline: 2px solid $brand;
+  outline-offset: 2px;
+}
+
+.current {
+  border-color: $brand;
+  background: $brand;
+  color: white;
+}
+
+.step[aria-disabled] {
+  box-shadow: none;
+  color: rgb(185, 185, 185);
+  cursor: default;
+}
+
+.gap {
+  display: inline-block;
+  min-width: 20px;
+  color: $muted;
+  text-align: center;
+}
+
+.summary {
+  margin: 0;
+  color: $muted;
+  font-size: .85em;
+}
+
+// Narrow phones: arrow-only prev/next so the row fits in 320px.
+@media (max-width: 479.98px) {
+  ul {
+    gap: 4px;
+  }
+
+  .step {
+    padding: 0;
+  }
+
+  .step .label {
+    display: none;
+  }
+}
+
+// Touch screens: 44px targets.
+@media (pointer: coarse) {
+  .num, .step {
+    min-width: 44px;
+    height: 44px;
+  }
+}

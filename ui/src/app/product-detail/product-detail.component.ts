@@ -27,18 +27,13 @@ export class ProductDetailComponent {
   constructor() {
     this.activatedRoute.params.subscribe({
       next: (params: Params) => {
-        this.productSvc.products$
-          .then(products => {
-            let id = parseInt(params['id']);
-            let curProduct = products.find(product => product.id === id);
-            if (curProduct) {
-              this.product = curProduct;
-            } else {
-              console.error(`Product with id ${id} not found`);
-            }
+        const id = parseInt(params['id']);
+        this.productSvc.getProduct(id)
+          .then(product => {
+            this.product = product;
           })
           .catch(error => {
-            console.error('Error fetching products:', error);
+            console.error(`Product with id ${id} not found`, error);
           });
       },
       error: (error) => {

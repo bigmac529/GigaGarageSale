@@ -39,6 +39,17 @@ the `target` in `ui/proxy.conf.json` to match.
 If you still see requests to `http://localhost:3000` or a CORS error, you are on an old checkout:
 `git pull` on `main`, then restart both terminals.
 
+## Products API
+
+`GET /api/products` accepts `page` and `pageSize` (default 24, max 100) plus the filters `q`
+(search), `merchant`, `brand`, `category` and `sort` (`featured`, `price-asc`, `price-desc`,
+`rating-desc`, `title-asc`). With `page` or `pageSize` it returns
+`{ items, total, page, pageSize, totalPages }`, paginating after filtering and sorting; without
+them it returns the plain array as before. `GET /api/products/facets` lists the filter values.
+
+To try the shop with a bigger catalog locally, point the API at another JSON file without
+touching `api/src/products.json`: `PRODUCTS_FILE=/path/to/big-products.json npm start`.
+
 ## socha3 hosting
 
 | Piece | Value |
