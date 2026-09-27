@@ -1,72 +1,367 @@
 @use '../shared/breakpoints' as bp;
 
+$brand: rgb(29, 176, 249);
+$brand-dark: rgb(24, 145, 198);
+$border: rgb(221, 221, 221);
+$muted: rgb(110, 110, 110);
+$radius: 8px;
+$shadow: 0 1px 3px rgba(0, 0, 0, .08);
+
+.cart {
+  padding: 24px;
+}
+
 h2 {
-  text-align: center;
-  margin-top: 10px;
+  margin: 0 0 20px;
+  font-size: 1.5em;
 }
 
-table {
-  width: 70%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
-  margin-bottom: 30px;
+.count {
+  color: $muted;
+  font-size: .6em;
+  font-weight: normal;
 }
 
-#total {
-  text-align: right;
-  padding: 10px;
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
 }
 
-.remove {
-  cursor: pointer;
-  color: rgb(29, 176, 249);
-  margin: 5px;
+// Line items
+.items {
+  flex: 1;
+  border: 1px solid $border;
+  border-radius: $radius;
+  border-spacing: 0;
+  box-shadow: $shadow;
 }
 
-#checkout {
-  text-align: center;
-  margin-bottom: 20px;
+th {
+  padding: 10px 12px;
+  border-bottom: 1px solid $border;
+  color: $muted;
+  font-size: .75em;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-align: left;
+  text-transform: uppercase;
 }
 
-#checkout button {
-  background-color: rgb(29, 176, 249);
-  color: white;
-  border: none;
-  padding: 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 10px;
-  border-color: black;
-  border-width: 2px;
-  border-style: solid;
+td {
+  padding: 14px 10px;
   vertical-align: middle;
 }
 
-#checkout button:hover {
-  background-color: rgb(24, 145, 198);
+tbody tr + tr td {
+  border-top: 1px solid $border;
 }
 
-// Phones: use the full width and tighten the table so all columns fit.
+.price, .subtotal {
+  text-align: right;
+  white-space: nowrap;
+}
+
+th:nth-child(2), th:nth-child(4) {
+  text-align: right;
+}
+
+th:nth-child(3), .qty {
+  text-align: center;
+}
+
+.subtotal {
+  font-weight: 600;
+}
+
+// Size the number/action columns to their content; the product column gets the rest.
+.price, .qty, .subtotal, .actions {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.each {
+  display: none;
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.thumb {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 64px;
+  height: 64px;
+  padding: 4px;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+
+.thumb img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.title {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.title:hover {
+  text-decoration: underline;
+}
+
+.meta {
+  margin-top: 2px;
+  color: $muted;
+  font-size: .8em;
+}
+
+// Quantity stepper
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+}
+
+.stepper button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  font: inherit;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.stepper button:hover:not(:disabled) {
+  background: rgb(240, 240, 240);
+}
+
+.stepper button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.stepper span {
+  min-width: 28px;
+  font-weight: 600;
+}
+
+.remove {
+  padding: 6px;
+  border: none;
+  background: none;
+  color: $muted;
+  font: inherit;
+  font-size: .85em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.remove:hover {
+  color: darkred;
+}
+
+// Order summary
+.summary {
+  position: sticky;
+  top: 20px;
+  flex: none;
+  width: 240px;
+  padding: 20px;
+  border: 1px solid $border;
+  border-radius: $radius;
+  background: rgb(250, 250, 250);
+  box-shadow: $shadow;
+}
+
+h3 {
+  margin: 0 0 16px;
+  font-size: 1.1em;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: $muted;
+}
+
+.total {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid $border;
+  color: black;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.btn-primary {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: $radius;
+  background: $brand;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: $brand-dark;
+  color: white;
+}
+
+// Empty state
+.empty {
+  padding: 40px 20px;
+  border: 1px solid $border;
+  border-radius: $radius;
+  color: $muted;
+  text-align: center;
+}
+
+.empty img {
+  opacity: .35;
+}
+
+.empty-title {
+  color: black;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.empty .btn-primary {
+  display: inline-block;
+  width: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// Summary drops below the items once the desktop frame no longer fits.
+@media (max-width: bp.$tablet) {
+  .layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary {
+    position: static;
+    align-self: flex-end;
+  }
+
+  td {
+    padding: 12px 8px;
+  }
+}
+
+// Phones: each line item becomes a card.
 @media (max-width: bp.$phone) {
-  table {
-    width: calc(100% - 10px);
-    border-collapse: collapse;
+  .cart {
+    padding: 16px 10px;
+  }
+
+  .items, tbody {
+    display: block;
+    border: none;
+    box-shadow: none;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "product product actions"
+      "qty price subtotal";
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid $border;
+    border-radius: $radius;
+    box-shadow: $shadow;
+  }
+
+  tbody td, tbody tr + tr td {
+    width: auto;
+    padding: 0;
+    border: none;
+  }
+
+  .product { grid-area: product; }
+  .qty { grid-area: qty; }
+  .subtotal { grid-area: subtotal; }
+
+  .price {
+    grid-area: price;
+    color: $muted;
     font-size: .85em;
+    text-align: left;
+    white-space: normal;
   }
 
-  th, td {
-    padding: 4px 2px;
+  .each {
+    display: inline;
   }
 
-  .remove {
-    margin: 0;
-    font-size: inherit;
+  .actions {
+    grid-area: actions;
+    align-self: start;
+  }
+
+  .thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .summary {
+    align-self: stretch;
+    width: auto;
   }
 }
 
+// Touch screens: 44px targets.
 @media (pointer: coarse) {
+  .stepper button {
+    width: 44px;
+    height: 44px;
+  }
+
   .remove {
+    min-width: 44px;
     min-height: 44px;
+  }
+
+  // Taller hit area for the title link without shifting the layout.
+  .title {
+    display: inline-block;
+    margin: -14px 0;
+    padding: 14px 0;
   }
 }
