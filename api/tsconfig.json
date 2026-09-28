@@ -11,9 +11,11 @@
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": [
-    "src"
+    "src",
+    "scripts"
   ]
 }

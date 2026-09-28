@@ -41,7 +41,9 @@ $HomeUrl = "http://localhost:$Port/"
 $WinSW = "C:\Tools\WinSW\GigaGarageSaleNode.exe"
 
 # Folders CI owns: mirrored exactly (files removed from the repo are removed here too).
-$MirrorDirs = @("api\src", "api\public", "shared", "scripts", "ui\src", "ui\public")
+# api\scripts (npm run db:seed) and db (SQL scripts) are shipped for the admin's manual
+# database seeding (docs/DATABASE.md); the deploy itself never touches the database.
+$MirrorDirs = @("api\src", "api\public", "api\scripts", "db", "shared", "scripts", "ui\src", "ui\public")
 # Folders whose top-level files CI owns: copied/overwritten, never deleted.
 $FileDirs = @("", "api", "ui")
 # Never copied over, never deleted.

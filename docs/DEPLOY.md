@@ -16,6 +16,7 @@ Every merge to `main` deploys the app to https://gigagaragesale.socha3.com/ thro
 
 1. **Build and test** (GitHub-hosted `ubuntu-latest`):
    - installs dependencies and builds the Angular UI in production mode
+   - runs the API tests (including the database-mode tests against SQLite)
    - runs the unit tests, but they **don't block the deploy yet**, because several specs already fail on `main` due to missing test providers
    - starts the API with the built UI and checks `/api/health` and `/`
    - uploads a package: the repo files at that commit plus the built UI in `api/public/spa`
@@ -23,7 +24,7 @@ Every merge to `main` deploys the app to https://gigagaragesale.socha3.com/ thro
 2. **Deploy** (the self-hosted runner on the server) downloads the package and runs `scripts/ci-deploy.ps1`, which:
    1. backs up the current code and `api\node_modules`
    2. stops `GigaGarageSaleNode` and makes sure nothing is still listening on port 3106
-   3. syncs the code folders (`api\src`, `api\public`, `shared`, `scripts`, `ui\src`, `ui\public`) and the top-level files. It never touches `web.config`, `.env` files, `data\`, `logs\` or anything else outside those folders.
+   3. syncs the code folders (`api\src`, `api\public`, `api\scripts`, `db`, `shared`, `scripts`, `ui\src`, `ui\public`) and the top-level files. It never touches `web.config`, `.env` files, `data\`, `logs\` or anything else outside those folders.
    4. runs `npm ci` for the API on the server, and makes sure `data\` and `web.config` exist (it creates `web.config` from `web.config.example` only if it's missing)
    5. starts the service and polls http://localhost:3106/api/health (plus `/`) for up to 90 seconds
    6. if anything fails after the service was stopped, it restores the backup, restarts the service, checks health again, and **fails the job**
@@ -153,7 +154,7 @@ After a deploy, `C:\WebApps\GigaGarageSale\DEPLOYED_COMMIT` contains the commit 
   ```powershell
   $b = "C:\WebApps\_deploy-backups\GigaGarageSale\<timestamp>"
   Stop-Service GigaGarageSaleNode
-  foreach ($d in "api\src","api\public","api\node_modules","shared","scripts","ui\src","ui\public") {
+  foreach ($d in "api\src","api\public","api\scripts","api\node_modules","db","shared","scripts","ui\src","ui\public") {
     robocopy "$b\$d" "C:\WebApps\GigaGarageSale\$d" /MIR
   }
   Start-Service GigaGarageSaleNode

@@ -40,10 +40,10 @@ jobs:
       - name: Check the commit is deployable
         id: check
         run: |
-          if grep -q "/api/health" api/src/index.ts && [ -f scripts/ci-deploy.ps1 ]; then
+          if grep -qs "/api/health" api/src/index.ts api/src/app.ts && [ -f scripts/ci-deploy.ps1 ]; then
             echo "deployable=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::api/src/index.ts has no /api/health endpoint (or scripts/ci-deploy.ps1 is missing); building only, the deploy job will be skipped."
+            echo "::warning::api/src/index.ts / app.ts has no /api/health endpoint (or scripts/ci-deploy.ps1 is missing); building only, the deploy job will be skipped."
             echo "deployable=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -65,6 +65,12 @@ jobs:
       - name: Install API dependencies
         working-directory: api
         run: npm ci --no-audit --no-fund
+
+      # Includes the database-mode tests (SQLite). The SQL Server tests skip without
+      # GGS_TEST_SQLSERVER_* settings.
+      - name: API tests
+        working-directory: api
+        run: npm test
 
       - name: Smoke test the API serving the built UI
         if: steps.check.outputs.deployable == 'true'
