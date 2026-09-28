@@ -1,21 +1,6 @@
-<main>
-  <section id="merchant">
-    Merchant: {{product?.merchant}}
-  </section>
-  <section id="stars">
-    <img *ngIf="product?.rating > 0" src="/assets/gold-star.png" class="star" />
-    <img *ngIf="product?.rating <= 0" src="/assets/empty-star.png" class="star" />
-
-    <img *ngIf="product?.rating > 1" src="/assets/gold-star.png" class="star" />
-    <img *ngIf="product?.rating <= 1" src="/assets/empty-star.png" class="star" />
-
-    <img *ngIf="product?.rating > 2" src="/assets/gold-star.png" class="star" />
-    <img *ngIf="product?.rating <= 2" src="/assets/empty-star.png" class="star" />
-
-    <img *ngIf="product?.rating > 3" src="/assets/gold-star.png" class="star" />
-    <img *ngIf="product?.rating <= 3" src="/assets/empty-star.png" class="star" />
-
-    <img *ngIf="product?.rating > 4" src="/assets/gold-star.png" class="star" />
-    <img *ngIf="product?.rating <= 4" src="/assets/empty-star.png" class="star" />
-  </section>
-</main>
+<span class="stars" role="img" [attr.aria-label]="'Rated ' + rating + ' out of 5'">
+  @for (star of stars; track star) {
+    <app-icon name="star" [size]="20" [filled]="true" [stroke]="0" class="star" [class.on]="star <= rating" />
+  }
+  <span class="value" aria-hidden="true">{{ rating }}.0</span>
+</span>
