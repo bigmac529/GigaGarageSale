@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { provideRouter } from '@angular/router';
 import { AboutComponent } from './about.component';
 
 describe('AboutComponent', () => {
@@ -8,7 +9,8 @@ describe('AboutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AboutComponent]
+      imports: [AboutComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
@@ -28,5 +30,13 @@ describe('AboutComponent', () => {
       expect(a.target).toBe('_blank');
       expect(a.rel).toBe('noopener noreferrer');
     }
+  });
+
+  it('keeps the story, mission and community sections', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('#our-story h2')?.textContent).toBe('Our Story');
+    expect(el.querySelector('#our-story')?.textContent).toContain('founded by Michael Socha and Danny Xiong');
+    expect(el.querySelectorAll('#mission li').length).toBe(3);
+    expect(el.querySelector('#community h2')?.textContent).toBe('Join Our Community');
   });
 });

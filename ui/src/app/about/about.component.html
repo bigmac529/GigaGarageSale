@@ -1,49 +1,53 @@
-<main>
-  <section id="our-story">
+<div class="about container">
+  <header class="intro">
+    <p class="kicker">About us</p>
+    <h1>Every computer part deserves a second life.</h1>
+  </header>
+
+  <section id="our-story" class="block story">
     <h2>Our Story</h2>
-    <p>GigaGarageSale was founded by Michael Socha and Danny Xiong, two super dedicated computer help desk technician coworkers at Harvard. While assisting faculty, staff, and students with their computer issues, Michael noticed a recurring trend: many students were in need of affordable computer parts while others were upgrading their systems, leaving their old but still functional components unused.</p>
+    <p class="lead">GigaGarageSale was founded by Michael Socha and Danny Xiong, two super dedicated computer help desk technician coworkers at Harvard. While assisting faculty, staff, and students with their computer issues, Michael noticed a recurring trend: many students were in need of affordable computer parts while others were upgrading their systems, leaving their old but still functional components unused.</p>
     <p>This observation spurred on Danny, being an already accomplished E-Bay reseller, to work with Michael to create a dedicated marketplace where gently used computer parts could be bought and sold, providing a solution for budget-conscious students and tech enthusiasts alike.</p>
   </section>
 
-  <section id="mission">
+  <section id="mission" class="block">
     <h2>Our Mission</h2>
     <p>At GigaGarageSale, our mission is to promote sustainability and affordability in the tech community. We believe that every computer part has a story and a potential second life. Our platform allows users to:</p>
-    <ul>
-      <li>Sell their gently used computer parts, helping others save money.</li>
-      <li>Find quality components at a fraction of the retail price.</li>
-      <li>Reduce electronic waste by giving old parts a new home.</li>
+    <ul class="pillars">
+      <li><span class="pillar-icon"><app-icon name="tag" /></span><span>Sell their gently used computer parts, helping others save money.</span></li>
+      <li><span class="pillar-icon"><app-icon name="search" /></span><span>Find quality components at a fraction of the retail price.</span></li>
+      <li><span class="pillar-icon"><app-icon name="refresh" /></span><span>Reduce electronic waste by giving old parts a new home.</span></li>
     </ul>
   </section>
 
-  <section id="community">
+  <section id="community" class="block community">
     <h2>Join Our Community</h2>
     <p>We are more than just a marketplace; we are a community of computer enthusiasts and eco-conscious individuals. By joining GigaGarageSale, you become part of a network that values quality, affordability, and sustainability.</p>
     <p>Whether you are looking to upgrade your setup or declutter your space, we invite you to explore and connect with fellow tech lovers. Together, we can make a difference in the way we consume technology!</p>
+    <a class="btn btn-primary" [routerLink]="['/shop']">Start browsing</a>
   </section>
 
-  <section id="links">
+  <section id="links" class="block">
     <h2>Project Links</h2>
     <div class="link-cards">
       <a class="link-card" href="https://github.com/bigmac529/GigaGarageSale" target="_blank" rel="noopener noreferrer">
-        <svg class="icon" viewBox="0 0 16 16" width="28" height="28" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
+        <span class="link-icon"><app-icon name="github" [size]="26" /></span>
         <span class="text">
           <span class="label">GigaGarageSale on GitHub</span>
           <span class="url">github.com/bigmac529/GigaGarageSale</span>
         </span>
+        <app-icon name="external" [size]="18" class="ext" />
         <span class="visually-hidden">(opens in a new tab)</span>
       </a>
       <a class="link-card" href="https://socha3.com" target="_blank" rel="noopener noreferrer">
-        <svg class="icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
-          <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3a9 9 0 100 18 9 9 0 000-18zm-9 9h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>
-        </svg>
+        <span class="link-icon"><app-icon name="globe" [size]="26" /></span>
         <span class="text">
           <span class="label">Michael Socha's portfolio</span>
           <span class="url">socha3.com</span>
         </span>
+        <app-icon name="external" [size]="18" class="ext" />
         <span class="visually-hidden">(opens in a new tab)</span>
       </a>
     </div>
   </section>
-</main>
+</div>
