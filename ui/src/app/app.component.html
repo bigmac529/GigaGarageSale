@@ -1,36 +1,56 @@
-<header>
-  <div id="logo">
-    <img src="/assets/ggs.png" />
-  </div>
-  
-  <nav>
-    <a [routerLink]="['shop']">Shop</a>
-    &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-    <a [routerLink]="['about']">About</a><br/>
-    <app-fade-out-text [text]="'Product inventory reset'"></app-fade-out-text>
-  </nav>
+<a class="skip-link" href="#main" (click)="skipToMain($event)">Skip to main content</a>
 
-  <div id="search">
-    <div id="searchIcon"></div>
-    <div>
-      <mat-form-field>
-        <input id="txtSearch" matInput type="text" enterkeyhint="search" placeholder="Search product" aria-label="Search products"
-               [formControl]="txtSearch" [matAutocomplete]="auto" #trigger="matAutocompleteTrigger"
-               (keydown.enter)="searchAll(trigger)">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTitle" (optionSelected)="selectSuggestion($event)">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option" style="font-size:9pt;background-color: white;">
-            {{option.title}}
+<header class="site-header">
+  <div class="bar container">
+    <a class="brand" [routerLink]="['/shop']" aria-label="GigaGarageSale home">
+      <img src="/assets/ggs.png" alt="" width="300" height="174" />
+      <span class="brand-name">Giga<span>Garage</span>Sale</span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main">
+      <a [routerLink]="['/shop']" routerLinkActive="active" ariaCurrentWhenActive="page">Shop</a>
+      <a [routerLink]="['/about']" routerLinkActive="active" ariaCurrentWhenActive="page">About</a>
+    </nav>
+
+    <div class="search" role="search">
+      <label for="txtSearch" class="visually-hidden">Search products</label>
+      <app-icon name="search" [size]="18" class="search-icon" />
+      <input id="txtSearch" type="search" enterkeyhint="search" autocomplete="off" spellcheck="false"
+             placeholder="Search GPUs, drives, monitors…"
+             [formControl]="txtSearch" [matAutocomplete]="auto" #trigger="matAutocompleteTrigger"
+             (keydown.enter)="searchAll(trigger)">
+      <mat-autocomplete #auto="matAutocomplete" class="ggs-suggestions" [displayWith]="displayTitle" (optionSelected)="selectSuggestion($event)">
+        @for (option of filteredOptions | async; track option.id) {
+          <mat-option [value]="option">
+            <span class="suggestion">
+              <img [src]="option.imageUrl" alt="" width="44" height="36" loading="lazy" />
+              <span class="suggestion-text">
+                <span class="suggestion-title">{{ option.title }}</span>
+                <span class="suggestion-meta">{{ option.brand }} · {{ option.price | currency: 'USD' }}</span>
+              </span>
+            </span>
           </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+        }
+      </mat-autocomplete>
     </div>
+
+    <a class="cart-link" [routerLink]="['/cart']" routerLinkActive="active" ariaCurrentWhenActive="page"
+       [attr.aria-label]="'Cart, ' + cartSvc.numItems + (cartSvc.numItems === 1 ? ' item' : ' items')">
+      <app-icon name="cart" [size]="22" />
+      <span class="cart-label">Cart</span>
+      <span id="numCartItems" class="badge" [class.empty]="cartSvc.numItems === 0" aria-hidden="true">{{ cartSvc.numItems }}</span>
+    </a>
   </div>
-  <a [routerLink]="['/cart']"><div id="cart"></div></a>
-  <div id="numCartItems">{{cartSvc.numItems}}</div>
 </header>
 
-<router-outlet></router-outlet>
+<main id="main" tabindex="-1">
+  <router-outlet></router-outlet>
+</main>
 
-<footer>
-  &copy; 2025 GigaGarageSale. All rights reserved.
-</footer>
+<app-site-footer [resetting]="resetting" (resetInventory)="resetInventory()" />
+
+<div class="toast-region" aria-live="polite">
+  @for (toast of toasts; track toast.id) {
+    <app-fade-out-text class="toast" [text]="toast.text" [duration]="2500" />
+  }
+</div>

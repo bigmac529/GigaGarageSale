@@ -1,0 +1,50 @@
+@use '../shared/breakpoints' as bp;
+
+:host { display: block; }
+
+.site-footer {
+  margin-top: var(--sp-9);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: var(--sp-6) var(--sp-7);
+  align-items: start;
+  padding-block: var(--sp-7);
+}
+
+.footer-brand { display: grid; gap: var(--sp-3); max-width: 34ch; }
+.footer-brand img { width: auto; height: 32px; }
+
+.footer-links { display: flex; flex-wrap: wrap; gap: 0 var(--sp-5); }
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--text);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+}
+.footer-links a:hover { color: var(--accent); text-decoration: underline; }
+
+.footer-meta { display: grid; justify-items: end; gap: var(--sp-1); text-align: right; }
+.footer-meta .link-btn { gap: 6px; padding-right: 0; color: var(--text-muted); font-size: var(--fs-xs); }
+.footer-meta .link-btn:hover { color: var(--accent); }
+
+@media (max-width: bp.$tablet) {
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-meta { grid-column: 1 / -1; justify-items: start; text-align: left; border-top: 1px solid var(--border); padding-top: var(--sp-4); }
+}
+
+@media (max-width: bp.$phone) {
+  .site-footer { margin-top: var(--sp-8); }
+  .footer-inner { grid-template-columns: 1fr; padding-block: var(--sp-6); }
+  .footer-meta .link-btn { padding-left: 0; }
+}
+

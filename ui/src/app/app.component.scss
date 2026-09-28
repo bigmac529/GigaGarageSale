@@ -1,161 +1,164 @@
-@use '@angular/material' as mat;
 @use './shared/breakpoints' as bp;
 
-header {
+:host { display: flex; flex-direction: column; min-height: 100vh; }
+
+main { flex: 1; outline: none; }
+
+// ---------------------------------------------------------------------------
+// Header: sticky, translucent, one row on tablet/desktop.
+// ---------------------------------------------------------------------------
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.6) blur(14px);
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+}
+
+.bar {
   display: flex;
-  background-color: rgb(221, 221, 221);
+  align-items: center;
+  gap: var(--sp-5);
+  height: 64px;
 }
 
-#logo {
-  padding: 5px;
-}
-
-#logo img {
-  height: 100px;
-}
-
-nav {
-  width: 225px;
-  padding-left: 140px;
-  padding-top: 45px;
-  font-size: 1.4em;
-  text-shadow: 2px 2px 2px #bbb;
-}
-
-nav app-fade-out-text {
-  margin-left: -20px;
-  font-size: .8em;
-}
-
-#search {
-  padding-top: 25px;
-  padding-left: 50px;
+.brand {
   display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: none;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
 }
+.brand img { width: auto; height: 36px; }
+.brand-name { font-size: var(--fs-lg); font-weight: var(--fw-bold); letter-spacing: -.02em; }
+.brand-name span { color: var(--accent); }
+.brand:hover { color: var(--text); }
 
+.main-nav { display: flex; gap: var(--sp-1); }
+.main-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  transition: background-color var(--dur), color var(--dur);
+}
+@media (hover: hover) {
+  .main-nav a:hover { background: var(--surface-2); color: var(--text); }
+}
+.main-nav a.active { background: var(--accent-soft); color: var(--text); }
 
-#search input {
-  font-size: .9em;
+.search {
+  position: relative;
+  flex: 1;
+  max-width: 560px;
   margin-left: auto;
-  margin-right: auto;
-  width: 200px;
-  padding: 4px 3px 3px 33px;
+}
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  color: var(--text-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.search input {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--sp-4) 0 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font-size: var(--fs-sm);
+  transition: border-color var(--dur), background-color var(--dur), box-shadow var(--dur);
+}
+.search input::placeholder { color: var(--text-muted); opacity: 1; }
+.search input:hover { border-color: var(--border-strong); }
+.search input:focus { outline: none; border-color: var(--accent); background: var(--surface); box-shadow: var(--ring); }
+.search input::-webkit-search-cancel-button { cursor: pointer; }
 
+.cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: none;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 var(--sp-4) 0 var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  transition: border-color var(--dur), background-color var(--dur);
+}
+.cart-link.active { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.cart-link .badge.empty { display: none; }
+@media (hover: hover) {
+  .cart-link:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
 }
 
-#searchIcon {
-  width: 30px;
-  height: 30px;
-  margin-top: 15px;
-  background-image: url('/assets/search.png');
-  background-repeat: no-repeat;
+@media (max-width: 1180px) {
+  .brand-name { display: none; }
 }
 
-#cart {
-  background-image: url('/assets/cart.png');
-  background-repeat: no-repeat;
-  align-content: center;
-  margin-left: 60px;
-  margin-top: 15px;
-  cursor: pointer;
-  height: 75px;
-  width: 75px;
-}
-
-#cart:hover {
-  background-image: url('/assets/cart-hover.png');
-}
-
-#numCartItems {
-  background-color:rgb(29, 176, 249);
-  border-radius: 10px;
-  height: 25px;
-  width: 25px;
-  margin-right: 5px;
-  text-align: center;
-  margin-top: 10px;
-  color: white;
-  font-weight: bold;
-}
-
-// Narrower than the desktop frame: let the header items share the space
-// instead of using fixed offsets.
 @media (max-width: bp.$tablet) {
-  header {
-    align-items: center;
-  }
-
-  nav {
-    flex: 1;
-    width: auto;
-    padding: 0 10px;
-    text-align: center;
-  }
-
-  #search {
-    padding-left: 0;
-  }
-
-  // 16px keeps iOS Safari from zooming in when the field is focused.
-  #search input {
-    font-size: 16px;
-  }
-
-  #cart {
-    margin-left: 20px;
-  }
+  .bar { gap: var(--sp-3); }
+  .main-nav a { padding: 0 var(--sp-3); }
+  .cart-label { display: none; }
+  .cart-link { padding: 0 var(--sp-3); }
 }
 
-// Phones: logo / nav / cart on the first row, full-width search below.
+// Phones: two rows. The brand/nav row scrolls away and the search + cart row stays
+// pinned (sticky with a negative top the height of the first row).
 @media (max-width: bp.$phone) {
-  header {
-    flex-wrap: wrap;
-  }
+  .site-header { top: -52px; }
 
-  #logo img {
-    height: 48px;
+  .bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'brand nav nav' 'search search cart';
+    gap: 0 var(--sp-2);
+    height: auto;
+    padding-bottom: var(--sp-3);
   }
-
-  nav {
-    font-size: 1.1em;
-    padding: 0;
-  }
-
-  #search {
-    order: 1;
-    flex-basis: 100%;
-    box-sizing: border-box;
-    padding: 0 10px 5px;
-  }
-
-  #search > div:last-child,
-  #search mat-form-field {
-    flex: 1;
-    width: 100%;
-  }
-
-  #search input {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  #cart {
-    margin: 0;
-    width: 48px;
-    height: 48px;
-    background-size: contain;
-  }
-
-  #numCartItems {
-    align-self: flex-start;
-    margin-top: 5px;
-  }
+  .brand { grid-area: brand; height: 52px; }
+  .brand img { height: 30px; }
+  .main-nav { grid-area: nav; justify-content: flex-end; }
+  .main-nav a { min-height: 44px; }
+  .search { grid-area: search; max-width: none; margin: 0; }
+  // 16px keeps iOS Safari from zooming in when the field is focused.
+  .search input { font-size: 16px; }
+  .cart-link { grid-area: cart; }
+  .cart-link .badge { position: absolute; top: -4px; right: -4px; }
 }
 
-// Touch screens: bigger tap targets for the nav links.
-@media (pointer: coarse) {
-  nav a {
-    display: inline-block;
-    padding: 11px 4px;
-  }
+// ---------------------------------------------------------------------------
+// Toasts
+// ---------------------------------------------------------------------------
+.toast-region {
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  bottom: var(--sp-6);
+  z-index: 200;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+@media (max-width: bp.$phone) {
+  .toast-region { bottom: 96px; }
 }

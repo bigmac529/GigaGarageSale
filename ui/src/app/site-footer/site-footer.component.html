@@ -1,0 +1,27 @@
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <img src="/assets/ggs.png" alt="GigaGarageSale" width="300" height="174" />
+      <p>Gently used computer parts from people who upgraded, for people on a budget.</p>
+    </div>
+
+    <nav class="footer-links" aria-label="Footer">
+      <a [routerLink]="['/shop']">Shop</a>
+      <a [routerLink]="['/about']">About</a>
+      <a href="https://github.com/bigmac529/GigaGarageSale" target="_blank" rel="noopener noreferrer">
+        <app-icon name="github" [size]="16" /> GitHub<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+      <a href="https://socha3.com" target="_blank" rel="noopener noreferrer">
+        <app-icon name="globe" [size]="16" /> socha3.com<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+    </nav>
+
+    <div class="footer-meta">
+      <p>&copy; 2025 GigaGarageSale. All rights reserved.</p>
+      <button type="button" id="resetInventory" class="link-btn" (click)="resetInventory.emit()" [disabled]="resetting"
+              title="Demo tool: restore every product's stock and empty the cart">
+        <app-icon name="refresh" [size]="14" /> Reset demo inventory
+      </button>
+    </div>
+  </div>
+</footer>
