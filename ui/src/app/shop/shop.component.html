@@ -1,112 +1,128 @@
-<img src="/assets/banner.png" />
-<main>
-  <aside class="filter">
-    <div id="filterTitle">Filters: <button type="button" id="clearFilters" (click)="clearFilters()">(clear)</button>
+<app-shop-hero />
+
+<div class="shop container">
+  @if (isDrawer && filtersOpen) {
+    <div class="scrim" (click)="closeFilters()" aria-hidden="true"></div>
+  }
+
+  <aside id="filterPanel" class="filters" [class.drawer]="isDrawer" [class.open]="filtersOpen"
+         [attr.role]="isDrawer ? 'dialog' : null" [attr.aria-modal]="isDrawer && filtersOpen ? 'true' : null"
+         aria-labelledby="filterTitle"
+         [cdkTrapFocus]="isDrawer && filtersOpen">
+    <div class="filters-head">
+      <span class="grabber" aria-hidden="true"></span>
+      <h2 id="filterTitle">Filters</h2>
+      @if (activeFilterCount) {
+        <button type="button" id="clearFilters" class="link-btn" (click)="clearFilters()">Clear all</button>
+      }
+      <button #closeFiltersBtn type="button" class="icon-btn close" (click)="closeFilters()" aria-label="Close filters">
+        <app-icon name="x" />
+      </button>
     </div>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>Merchants</mat-expansion-panel-header>
-      <ng-template matExpansionPanelContent>
-        <div class="filterOption" *ngFor="let merchant of merchants">
-          <label><input type="radio" name="merchant" [value]="merchant" [checked]="same(state.merchant, merchant)" (change)="setFilter('merchant', merchant)" /><span class="filterText" appOverflowText>{{merchant}}</span></label>
-        </div>
-      </ng-template>
-    </mat-expansion-panel>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>Brands</mat-expansion-panel-header>
-      <ng-template matExpansionPanelContent>
-        <div class="filterOption" *ngFor="let brand of brands">
-          <label><input type="radio" name="brand" [value]="brand" [checked]="same(state.brand, brand)" (change)="setFilter('brand', brand)" /><span class="filterText" appOverflowText>{{brand}}</span></label>
-        </div>
-      </ng-template>
-    </mat-expansion-panel>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>Categories</mat-expansion-panel-header>
-      <ng-template matExpansionPanelContent>
-        <div class="filterOption" *ngFor="let category of categories">
-          <label><input type="radio" name="category" [value]="category" [checked]="same(state.category, category)" (change)="setFilter('category', category)" /><span class="filterText" appOverflowText>{{category}}</span></label>
-        </div>
-      </ng-template>
-    </mat-expansion-panel>
+
+    <app-filter-groups class="filters-body" [groups]="filterGroups" [selected]="state" [open]="openGroups"
+                       (pick)="setFilter($event.key, $event.value)" (openChange)="openGroups[$event.key] = $event.open" />
+
+    <div class="filters-foot">
+      <button type="button" class="btn btn-primary btn-block btn-lg" (click)="closeFilters()">
+        @if (result) { Show {{ result.total | number }} {{ result.total === 1 ? 'product' : 'products' }} } @else { Show products }
+      </button>
+    </div>
   </aside>
 
-  <section class="results" [class.loading]="loading && !!result" [attr.aria-busy]="loading">
-    <div class="toolbar">
-      <p class="count">
-        @if (result) {
-          {{ result.total | number }} {{ result.total === 1 ? 'product' : 'products' }}
-        }
-      </p>
-      <label class="select">
-        <span>Sort</span>
-        <select [value]="state.sort" (change)="setSort($any($event.target).value)">
-          @for (s of sorts; track s.value) {
-            <option [value]="s.value" [selected]="s.value === state.sort">{{ s.label }}</option>
+  <section id="results" class="results" [class.loading]="loading && !!result" [attr.aria-busy]="loading" aria-labelledby="resultsTitle">
+    <div class="results-head">
+      <div class="heading">
+        <h2 id="resultsTitle">
+          {{ resultsTitle }}
+        </h2>
+        <p class="count">
+          @if (result) {
+            {{ result.total | number }} {{ result.total === 1 ? 'product' : 'products' }}
+          } @else {
+            &nbsp;
           }
-        </select>
-      </label>
-      <label class="select">
-        <span>Per page</span>
-        <select [value]="state.pageSize" (change)="setPageSize($any($event.target).value)">
-          @for (size of pageSizes; track size) {
-            <option [value]="size" [selected]="size === state.pageSize">{{ size }}</option>
+        </p>
+      </div>
+      <div class="toolbar">
+        <button #openFiltersBtn type="button" id="openFilters" class="btn btn-secondary filters-btn" (click)="openFilters()"
+                aria-controls="filterPanel" [attr.aria-expanded]="filtersOpen">
+          <app-icon name="filter" [size]="18" /> Filters
+          @if (activeFilterCount) {
+            <span class="badge" [attr.aria-label]="activeFilterCount + ' active'">{{ activeFilterCount }}</span>
           }
-        </select>
-      </label>
+        </button>
+        <label class="select">
+          <span class="select-label">Sort</span>
+          <select [value]="state.sort" (change)="setSort($any($event.target).value)">
+            @for (s of sorts; track s.value) {
+              <option [value]="s.value" [selected]="s.value === state.sort">{{ s.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="select">
+          <span class="select-label">Show</span>
+          <select [value]="state.pageSize" (change)="setPageSize($any($event.target).value)" aria-label="Products per page">
+            @for (size of pageSizes; track size) {
+              <option [value]="size" [selected]="size === state.pageSize">{{ size }}</option>
+            }
+          </select>
+        </label>
+      </div>
     </div>
 
     @if (hasFilters) {
       <ul class="chips" aria-label="Active filters">
         @if (state.q) {
-          <li><button type="button" (click)="setFilter('q', '')" [attr.aria-label]="'Remove search ' + state.q">“{{ state.q }}” <span aria-hidden="true">✕</span></button></li>
+          <li><button type="button" class="chip" (click)="setFilter('q', '')" [attr.aria-label]="'Remove search ' + state.q">“{{ state.q }}” <span class="x" aria-hidden="true">✕</span></button></li>
         }
         @if (state.merchant) {
-          <li><button type="button" (click)="setFilter('merchant', '')" [attr.aria-label]="'Remove merchant ' + state.merchant">{{ state.merchant }} <span aria-hidden="true">✕</span></button></li>
+          <li><button type="button" class="chip" (click)="setFilter('merchant', '')" [attr.aria-label]="'Remove merchant ' + state.merchant">{{ state.merchant }} <span class="x" aria-hidden="true">✕</span></button></li>
         }
         @if (state.brand) {
-          <li><button type="button" (click)="setFilter('brand', '')" [attr.aria-label]="'Remove brand ' + state.brand">{{ state.brand }} <span aria-hidden="true">✕</span></button></li>
+          <li><button type="button" class="chip" (click)="setFilter('brand', '')" [attr.aria-label]="'Remove brand ' + state.brand">{{ state.brand }} <span class="x" aria-hidden="true">✕</span></button></li>
         }
         @if (state.category) {
-          <li><button type="button" (click)="setFilter('category', '')" [attr.aria-label]="'Remove category ' + state.category">{{ state.category }} <span aria-hidden="true">✕</span></button></li>
+          <li><button type="button" class="chip" (click)="setFilter('category', '')" [attr.aria-label]="'Remove category ' + state.category">{{ state.category }} <span class="x" aria-hidden="true">✕</span></button></li>
         }
+        <li><button type="button" class="link-btn clear-all" (click)="clearFilters()">Clear all</button></li>
       </ul>
     }
 
     @if (error) {
-      <div class="notice">
+      <div class="notice" role="alert">
+        <span class="notice-icon"><app-icon name="alert" [size]="28" /></span>
         <p class="notice-title">Couldn't load products</p>
         <p>Check your connection and try again.</p>
-        <button type="button" class="btn-primary" (click)="reload()">Try again</button>
+        <button type="button" class="btn btn-primary" (click)="reload()">Try again</button>
       </div>
     } @else if (!result) {
-      <p class="status">Loading products…</p>
+      <div class="grid" aria-hidden="true">
+        @for (i of skeletons; track i) {
+          <div class="product-skeleton">
+            <div class="skeleton sk-image"></div>
+            <div class="skeleton sk-line short"></div>
+            <div class="skeleton sk-line"></div>
+            <div class="skeleton sk-line"></div>
+            <div class="skeleton sk-price"></div>
+          </div>
+        }
+      </div>
+      <p class="visually-hidden" role="status">Loading products…</p>
     } @else if (result.total === 0) {
       <div class="notice">
-        <img src="/assets/search.png" alt="" />
+        <span class="notice-icon"><app-icon name="search" [size]="28" /></span>
         <p class="notice-title">No products found</p>
         <p>Try removing a filter or searching for something else.</p>
-        <button type="button" class="btn-primary" (click)="clearFilters()">Clear filters</button>
+        <button type="button" class="btn btn-primary" (click)="clearFilters()">Clear filters</button>
       </div>
     } @else {
-      <div id="products">
+      <div id="products" class="grid">
         @for (product of products; track product.id) {
-          <div class="product">
-            <a [routerLink]="['/product-detail', product.id]">
-              <div class="productImageDiv">
-                <img class="productImage" [src]="product.imageUrl" [alt]="product.title" loading="lazy" />
-              </div>
-            </a>
-            <div class="productTitle"><a [routerLink]="['/product-detail', product.id]">{{product.title}}</a></div>
-            <div class="productBrandMerchant">{{product.category}} / {{product.brand}} ({{product.merchant}})</div>
-            <div style="display:flex">
-              <div class="productPrice">{{product.price | currency: 'USD'}}</div>
-              @if (product.available == 0) {
-                <div class="productAvailability">(out of stock)</div>
-              }
-            </div>
-          </div>
+          <app-product-card [product]="product" />
         }
       </div>
       <app-pager [page]="result.page" [pageSize]="result.pageSize" [total]="result.total" [totalPages]="result.totalPages" />
     }
   </section>
-</main>
+</div>

@@ -1,314 +1,167 @@
 @use '../shared/breakpoints' as bp;
 
-// Same palette as the cart page.
-$brand: rgb(29, 176, 249);
-$brand-dark: rgb(24, 145, 198);
-$border: rgb(221, 221, 221);
-$muted: rgb(110, 110, 110);
-$radius: 8px;
+// ---------------------------------------------------------------------------
+// Layout: sticky filter sidebar + results
+// ---------------------------------------------------------------------------
+.shop {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  gap: var(--sp-7);
+  align-items: start;
+  padding-top: var(--sp-7);
+}
 
-main {
+.filters {
+  position: sticky;
+  top: calc(64px + var(--sp-4));
   display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 64px - var(--sp-7));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
-.filter {
-  margin: 20px;
-  width: 200px;
-  height: 100%;
-}
-
-#filterTitle {
-  display: flex;
-  margin-top: -1px;
-  margin-bottom: 5px;
-  padding-left: 10px;
-  width: 200px;
-}
-
-// One option per line, starting flush with the panel heading. Names that don't fit are
-// clipped where the panel ends (the -24px cancels the panel body's right padding);
-// hovering shows the full name and drag-selecting scrolls the rest into view
-// (see OverflowTextDirective).
-.filterOption {
-  margin-right: -24px;
-}
-
-.filterOption label {
+.filters-head {
   display: flex;
   align-items: center;
-  min-width: 0;
-  cursor: pointer;
+  gap: var(--sp-2);
+  min-height: 56px;
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  border-bottom: 1px solid var(--border);
 }
+.filters-head h2 { flex: 1; font-size: var(--fs-md); font-weight: var(--fw-bold); }
+.filters-head .link-btn { min-height: 40px; }
+.close, .grabber, .filters-foot { display: none; }
 
-.filterOption input {
-  flex: none;
-  margin: 0 5px 0 0;
-}
+.filters-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--sp-1) 0; }
 
-.filterText {
-  flex: 1 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  // Plain clipping rather than an ellipsis: the text is scrolled while drag-selecting,
-  // and an ellipsis would hide the very characters being revealed.
-  user-select: text;
-  -webkit-user-select: text;
-}
+// ---------------------------------------------------------------------------
+// Results
+// ---------------------------------------------------------------------------
+.results { min-width: 0; }
 
-#clearFilters {
-  padding: 0 0 0 4px;
-  border: none;
-  background: none;
-  font: inherit;
-  font-size: .9em;
-  color: rgb(128, 128, 128);
-  margin-top: 1px;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-#clearFilters:hover {
-  color: rgb(190, 190, 190);
-}
-
-.results {
-  width: 727px;
-  min-width: 0;
-  margin: 20px 0 10px 7px;
-  transition: opacity .15s;
-}
-
-.results.loading #products {
-  opacity: .5;
-}
-
-.toolbar {
+.results-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
-  margin: 0 10px 10px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
 }
+.heading { min-width: 0; }
+.heading h2 { overflow-wrap: anywhere; font-size: var(--fs-2xl); font-weight: var(--fw-bold); }
+.count { margin-top: 2px; color: var(--text-muted); font-size: var(--fs-sm); }
 
-.count {
-  flex: 1;
-  margin: 0;
-  color: $muted;
-  font-size: .9em;
-}
-
-.select {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: $muted;
-  font-size: .85em;
-}
-
-select {
-  height: 34px;
-  padding: 0 8px;
-  border: 1px solid $border;
-  border-radius: $radius;
-  background: white;
-  font: inherit;
-  color: black;
-}
-
-select:focus-visible, .chips button:focus-visible {
-  outline: 2px solid $brand;
-  outline-offset: 1px;
-}
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.filters-btn { display: none; }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 10px 10px;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-5);
   padding: 0;
   list-style: none;
 }
+.clear-all { min-height: 34px; }
 
-.chips button {
-  max-width: 100%;
-  padding: 5px 12px;
-  border: 1px solid $brand;
-  border-radius: 999px;
-  background: rgba(29, 176, 249, .08);
-  font: inherit;
-  font-size: .8em;
-  overflow-wrap: anywhere;
-  cursor: pointer;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(212px, 1fr));
+  gap: var(--sp-5);
+  transition: opacity var(--dur);
 }
+.results.loading .grid { opacity: .45; }
 
-.chips button:hover {
-  background: rgba(29, 176, 249, .18);
+.product-skeleton {
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
+.sk-image { aspect-ratio: 6 / 5; margin-bottom: var(--sp-2); border-radius: calc(var(--radius-lg) - 6px); }
+.sk-line { height: 12px; margin: 0 var(--sp-2); }
+.sk-line.short { width: 40%; }
+.sk-price { width: 35%; height: 20px; margin: var(--sp-2) var(--sp-2) 0; }
 
-.status, .notice {
-  margin: 10px;
-  color: $muted;
-  text-align: center;
-}
+app-pager { display: block; margin-top: var(--sp-7); }
 
-.notice {
-  padding: 40px 20px;
-  border: 1px solid $border;
-  border-radius: $radius;
-}
-
-.notice img {
-  opacity: .35;
-}
-
-.notice-title {
-  color: black;
-  font-size: 1.2em;
-  font-weight: 600;
-}
-
-.btn-primary {
-  padding: 12px 20px;
-  border: none;
-  border-radius: $radius;
-  background: $brand;
-  color: white;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background: $brand-dark;
-}
-
-#products {
-  display: flex;
-  flex-wrap: wrap;
-  transition: opacity .15s;
-}
-
-.product {
-  width: 200px;
-  height: 300px;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid $border;
-  border-radius: 5px;
-  font-size: 0.8em;
-}
-
-.productTitle {
-  margin-top: 10px;
-  margin-bottom: 6px;
-}
-
-.productImageDiv {
-  height: 200px;
-  align-content: center;
-}
-
-.productImage {
-  width: 200px;
-  height: auto;
-}
-
-.productBrandMerchant {
-  font-size: 0.75em;
-  margin-bottom: 10px;
-}
-
-.productPrice {
-  font-size: 1.4em;
-  display: inline;
-  margin-top: 8px;
-}
-
-.productAvailability {
-  color: darkred;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin-top: 13px;
-  margin-left: 10px;
-}
-
-a {
-  cursor: pointer
-}
-
+// ---------------------------------------------------------------------------
+// Phones and tablets: filters become a drawer (tablet) or bottom sheet (phone)
+// ---------------------------------------------------------------------------
 @media (max-width: bp.$tablet) {
-  .results {
-    flex: 1;
-    width: auto;
+  .shop { grid-template-columns: minmax(0, 1fr); padding-top: var(--sp-6); }
+
+  .filters {
+    position: fixed;
+    z-index: 100;
+    inset: 0 auto 0 0;
+    width: min(380px, 88vw);
+    max-height: none;
+    border: 0;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform .28s var(--ease), visibility 0s linear .28s;
   }
+  .filters.open { transform: none; visibility: visible; transition: transform .28s var(--ease), visibility 0s; }
+  .close { display: inline-grid; }
+  .filters-foot { display: block; padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+
+  .scrim {
+    position: fixed;
+    z-index: 90;
+    inset: 0;
+    background: var(--scrim);
+    animation: fade-in .2s ease;
+  }
+
+  .filters-btn { display: inline-flex; }
 }
 
-// Phones: filters stack above a two-column product grid.
+@keyframes fade-in { from { opacity: 0; } }
+
 @media (max-width: bp.$phone) {
-  main {
-    flex-direction: column;
-  }
 
-  .filter {
+  .shop { padding-top: var(--sp-5); }
+
+  .filters {
+    inset: auto 0 0 0;
     width: auto;
-    margin: 10px;
+    max-height: 88dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(105%);
   }
+  .grabber {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-strong);
+    transform: translateX(-50%);
+  }
+  .filters-head { position: relative; padding-top: var(--sp-4); }
 
-  #filterTitle {
-    width: auto;
-    align-items: center;
-  }
+  .results-head { align-items: stretch; flex-direction: column; }
+  .heading h2 { font-size: var(--fs-xl); }
+  .toolbar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sp-2); }
+  .toolbar .select { min-width: 0; }
+  .toolbar .select select { width: 100%; }
+  .select-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .filters-btn { padding: 0 var(--sp-4); }
 
-  .results {
-    margin: 0 5px 10px;
-  }
-
-  .toolbar, .chips {
-    margin: 0 5px 10px;
-  }
-
-  .count {
-    flex-basis: 100%;
-  }
-
-  .product {
-    box-sizing: border-box;
-    width: calc(50% - 10px);
-    height: auto;
-    margin: 5px;
-  }
-
-  .productImageDiv {
-    height: auto;
-    aspect-ratio: 1;
-  }
-
-  .productImage {
-    width: 100%;
-  }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
 }
 
-// Touch screens: 44px targets for filters, selects and chips.
 @media (pointer: coarse) {
-  #clearFilters {
-    min-height: 44px;
-    padding: 0 10px;
-    margin-top: 0;
-  }
-
-  .filter label {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-  }
-
-  select, .chips button {
-    min-height: 44px;
-  }
-
-  // 16px keeps iOS Safari from zooming in when a select is focused.
-  select {
-    font-size: 16px;
-  }
+  .clear-all, .filters-head .link-btn { min-height: 44px; }
 }

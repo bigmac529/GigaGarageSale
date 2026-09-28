@@ -4,9 +4,9 @@
       <li>
         @if (page > 1) {
           <a class="step" [routerLink]="[]" [queryParams]="params(page - 1)" queryParamsHandling="merge"
-             rel="prev" aria-label="Previous page"><span aria-hidden="true">‹</span><span class="label">Prev</span></a>
+             rel="prev" aria-label="Previous page"><app-icon name="chevron-left" [size]="18" /><span class="label">Prev</span></a>
         } @else {
-          <span class="step" aria-disabled="true"><span aria-hidden="true">‹</span><span class="label">Prev</span></span>
+          <span class="step" aria-disabled="true"><app-icon name="chevron-left" [size]="18" /><span class="label">Prev</span></span>
         }
       </li>
       @for (item of items; track item) {
@@ -24,9 +24,9 @@
       <li>
         @if (page < totalPages) {
           <a class="step" [routerLink]="[]" [queryParams]="params(page + 1)" queryParamsHandling="merge"
-             rel="next" aria-label="Next page"><span class="label">Next</span><span aria-hidden="true">›</span></a>
+             rel="next" aria-label="Next page"><span class="label">Next</span><app-icon name="chevron-right" [size]="18" /></a>
         } @else {
-          <span class="step" aria-disabled="true"><span class="label">Next</span><span aria-hidden="true">›</span></span>
+          <span class="step" aria-disabled="true"><span class="label">Next</span><app-icon name="chevron-right" [size]="18" /></span>
         }
       </li>
     </ul>

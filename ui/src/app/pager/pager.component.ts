@@ -1,6 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { IconComponent } from '../shared/icon/icon.component';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -45,7 +46,7 @@ export function pageItems(page: number, totalPages: number, siblings = 1): PageI
  */
 @Component({
   selector: 'app-pager',
-  imports: [RouterModule, DecimalPipe],
+  imports: [RouterModule, DecimalPipe, IconComponent],
   templateUrl: './pager.component.html',
   styleUrl: './pager.component.scss'
 })

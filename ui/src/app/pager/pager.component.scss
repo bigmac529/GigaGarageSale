@@ -1,21 +1,11 @@
-// Matches the cart page's look (same brand colour, borders, radius and shadow).
-$brand: rgb(29, 176, 249);
-$brand-dark: rgb(24, 145, 198);
-$border: rgb(221, 221, 221);
-$muted: rgb(110, 110, 110);
-$radius: 8px;
-$shadow: 0 1px 3px rgba(0, 0, 0, .08);
-
-:host {
-  display: block;
-}
+:host { display: block; }
 
 .pager {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 16px 0 8px;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
 }
 
 ul {
@@ -25,7 +15,11 @@ ul {
   align-items: center;
   gap: 6px;
   margin: 0;
-  padding: 0;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   list-style: none;
 }
 
@@ -33,85 +27,33 @@ ul {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  min-width: 40px;
-  height: 40px;
-  padding: 0 10px;
-  border: 1px solid $border;
-  border-radius: $radius;
-  background: white;
-  box-shadow: $shadow;
-  color: black;
-  font-size: .9em;
-  font-weight: 600;
+  gap: 4px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 var(--sp-3);
+  border-radius: var(--radius-pill);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
   text-decoration: none;
   user-select: none;
-  transition: background-color .15s, border-color .15s, color .15s;
+  transition: background-color var(--dur), color var(--dur);
 }
 
-.step {
-  gap: 6px;
-}
+a.num:hover, a.step:hover { background: var(--surface-2); color: var(--text); }
 
-.step span[aria-hidden] {
-  font-size: 1.3em;
-  line-height: 1;
-}
+.current { background: var(--accent); color: var(--on-accent); }
 
-a.num:hover, a.step:hover {
-  border-color: $brand;
-  color: $brand-dark;
-}
+.step[aria-disabled] { color: var(--text-muted); opacity: .45; cursor: default; }
 
-a:focus-visible {
-  outline: 2px solid $brand;
-  outline-offset: 2px;
-}
+.gap { display: inline-block; min-width: 20px; color: var(--text-muted); text-align: center; }
 
-.current {
-  border-color: $brand;
-  background: $brand;
-  color: white;
-}
-
-.step[aria-disabled] {
-  box-shadow: none;
-  color: rgb(185, 185, 185);
-  cursor: default;
-}
-
-.gap {
-  display: inline-block;
-  min-width: 20px;
-  color: $muted;
-  text-align: center;
-}
-
-.summary {
-  margin: 0;
-  color: $muted;
-  font-size: .85em;
-}
+.summary { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); }
 
 // Narrow phones: arrow-only prev/next so the row fits in 320px.
 @media (max-width: 479.98px) {
-  ul {
-    gap: 4px;
-  }
-
-  .step {
-    padding: 0;
-  }
-
-  .step .label {
-    display: none;
-  }
-}
-
-// Touch screens: 44px targets.
-@media (pointer: coarse) {
-  .num, .step {
-    min-width: 44px;
-    height: 44px;
-  }
+  ul { gap: 2px; padding: 4px; }
+  .step { padding: 0; }
+  .step .label { display: none; }
 }

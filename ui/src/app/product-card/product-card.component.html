@@ -1,0 +1,26 @@
+<article class="product" [class.sold-out]="soldOut">
+  <div class="image-well">
+    <img [src]="product.imageUrl" alt="" width="600" height="500" loading="lazy" decoding="async" />
+    @if (soldOut) {
+      <span class="stock-flag">Out of stock</span>
+    }
+  </div>
+  <div class="body">
+    <p class="kicker">{{ product.category }}</p>
+    <h3 class="title">
+      <a class="product-link" [routerLink]="['/product-detail', product.id]">{{ product.title }}</a>
+    </h3>
+    <p class="meta"><span>{{ product.brand }}</span><span class="dot" aria-hidden="true">·</span><span class="merchant">{{ product.merchant }}</span></p>
+    <div class="foot">
+      <p class="price">{{ product.price | currency: 'USD' }}</p>
+      <p class="rating" [attr.aria-label]="'Rated ' + product.rating + ' out of 5'">
+        <app-icon name="star" [size]="14" [filled]="true" [stroke]="0" /><span aria-hidden="true">{{ product.rating }}.0</span>
+      </p>
+      <button type="button" class="quick-add" [class.added]="justAdded" (click)="addToCart()" [disabled]="soldOut"
+              [attr.aria-label]="soldOut ? product.title + ' is out of stock' : 'Add ' + product.title + ' to cart'"
+              [title]="soldOut ? 'Out of stock' : 'Add to cart'">
+        <app-icon [name]="justAdded ? 'check' : 'cart-plus'" [size]="20" />
+      </button>
+    </div>
+  </div>
+</article>
