@@ -8,6 +8,8 @@ import { IProduct } from '../../../../shared/i-product';
 import { IProductPage } from '../../../../shared/i-product-page';
 
 import { ShopComponent } from './shop.component';
+import { ShopMemoryService } from '../shared/shop-memory.service';
+import { ShoppingCartService } from '../shared/shopping-cart-service';
 
 function product(id: number): IProduct {
   return {
@@ -91,10 +93,12 @@ describe('ShopComponent', () => {
     flushPage({ items: [product(1)], total: 1 });
     harness.detectChanges();
     const el = harness.routeNativeElement as HTMLElement;
-    (el.querySelector('mat-expansion-panel-header') as HTMLElement).click();
+    const merchants = Array.from(el.querySelectorAll('details.filter-group')).find(d => d.querySelector('summary')?.textContent?.includes('Merchants')) as HTMLDetailsElement;
+    merchants.querySelector('summary')!.click();
     harness.detectChanges();
+    expect(merchants.open).toBeTrue();
 
-    const name = el.querySelector('.filterOption .filterText') as HTMLElement;
+    const name = merchants.querySelector('.filterOption .filterText') as HTMLElement;
     expect(name.textContent).toBe('Dan F');
     const rect = name.getBoundingClientRect();
     const at = { bubbles: true, cancelable: true, clientX: rect.left + 2, clientY: rect.top + 2, button: 0, detail: 1 };
@@ -106,5 +110,80 @@ describe('ShopComponent', () => {
     const req = flushPage({ items: [product(1)], total: 1 });
     expect(req.request.params.get('merchant')).toBe('Dan F');
     expect(TestBed.inject(Router).url).toBe('/shop?merchant=Dan%20F');
+  });
+
+  it('shows skeleton cards until the first page arrives', async () => {
+    await harness.navigateByUrl('/shop', ShopComponent);
+    flushStartup();
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    expect(el.querySelectorAll('.product-skeleton').length).toBeGreaterThan(0);
+    flushPage({ items: [product(1), product(2)], total: 2 });
+    harness.detectChanges();
+    expect(el.querySelectorAll('.product-skeleton').length).toBe(0);
+    expect(el.querySelectorAll('app-product-card').length).toBe(2);
+  });
+
+  it('describes the results and counts active filters', async () => {
+    const shop = await harness.navigateByUrl('/shop?brand=ASUS&category=GPU&merchant=Dan%20F', ShopComponent);
+    flushStartup();
+    flushPage({ items: [product(1)], total: 1 });
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    expect(el.querySelector('#resultsTitle')?.textContent?.trim()).toBe('ASUS GPU');
+    expect(shop.activeFilterCount).toBe(3);
+    expect(el.querySelector('#openFilters .badge')?.textContent?.trim()).toBe('3');
+    expect(el.querySelectorAll('.chips .chip').length).toBe(3);
+    // Groups with an active filter start expanded.
+    expect(Array.from(el.querySelectorAll('details.filter-group')).every(d => (d as HTMLDetailsElement).open)).toBeTrue();
+  });
+
+  it('remembers the shop query so product pages can link back to it', async () => {
+    await harness.navigateByUrl('/shop?category=GPU&sort=price-asc', ShopComponent);
+    flushStartup();
+    flushPage({ items: [product(1)], total: 1 });
+    expect(TestBed.inject(ShopMemoryService).lastParams).toEqual({ category: 'GPU', sort: 'price-asc' });
+  });
+
+  it('opens the filter drawer, traps focus there and closes on Escape', async () => {
+    const shop = await harness.navigateByUrl('/shop', ShopComponent);
+    flushStartup();
+    flushPage({ items: [product(1)], total: 1 });
+    shop.isDrawer = true; // as below the drawer breakpoint
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    const openBtn = el.querySelector('#openFilters') as HTMLButtonElement;
+    openBtn.focus();
+    openBtn.click();
+    harness.detectChanges();
+    await new Promise(resolve => setTimeout(resolve, 80));
+
+    const panel = el.querySelector('#filterPanel') as HTMLElement;
+    expect(shop.filtersOpen).toBeTrue();
+    expect(panel.classList).toContain('open');
+    expect(panel.getAttribute('role')).toBe('dialog');
+    expect(panel.getAttribute('aria-modal')).toBe('true');
+    expect(openBtn.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Close filters');
+    expect(document.body.classList).toContain('no-scroll');
+    expect(el.querySelectorAll('.cdk-focus-trap-anchor').length).toBeGreaterThan(0);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    harness.detectChanges();
+    expect(shop.filtersOpen).toBeFalse();
+    expect(panel.classList).not.toContain('open');
+    expect(document.activeElement).toBe(openBtn);
+    expect(document.body.classList).not.toContain('no-scroll');
+  });
+
+  it('quick add on a card puts the product in the cart', async () => {
+    await harness.navigateByUrl('/shop', ShopComponent);
+    flushStartup();
+    const p = product(7);
+    flushPage({ items: [p], total: 1 });
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    (el.querySelector('.quick-add') as HTMLButtonElement).click();
+    expect(TestBed.inject(ShoppingCartService).numItems).toBe(1);
   });
 });

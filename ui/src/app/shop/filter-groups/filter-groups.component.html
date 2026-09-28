@@ -1,0 +1,20 @@
+@for (group of groups; track group.key) {
+  <details class="filter-group" [open]="open[group.key]" (toggle)="toggled(group.key, $event)">
+    <summary>
+      <span class="group-label">{{ group.label }}</span>
+      @if (selected[group.key]) {
+        <span class="group-value">{{ selected[group.key] }}</span>
+      }
+      <app-icon name="chevron-down" [size]="18" class="chev" />
+    </summary>
+    <div class="filter-list" role="radiogroup" [attr.aria-label]="group.label">
+      @for (option of group.options; track option) {
+        <div class="filterOption">
+          <label><input type="radio" [name]="group.key" [value]="option" [checked]="same(selected[group.key], option)" (change)="pick.emit({ key: group.key, value: option })" /><span class="filterText" appOverflowText>{{option}}</span></label>
+        </div>
+      } @empty {
+        <p class="filter-empty">Loading…</p>
+      }
+    </div>
+  </details>
+}

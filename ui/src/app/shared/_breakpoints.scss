@@ -1,6 +1,6 @@
-// Shared responsive breakpoints.
-// The desktop layout is a fixed 1000px frame (plus its 2px double border), so
-// anything narrower than that switches to the fluid layout. Phones get an
-// additional stacked / single-column treatment.
-$tablet: 1003px;
-$phone: 640px;
+// Shared responsive breakpoints (use with max-width media queries).
+// Below $tablet the shop filters move into a slide-out drawer and the layout goes
+// single-column where needed; below $phone the header compacts into two rows and
+// the filter drawer becomes a bottom sheet.
+$tablet: 1002.98px;
+$phone: 639.98px;

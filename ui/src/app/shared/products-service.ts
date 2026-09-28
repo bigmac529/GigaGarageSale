@@ -2,7 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { IProduct } from "../../../../shared/i-product";
 import { IProductFacets, IProductPage, IProductQuery } from "../../../../shared/i-product-page";
 import { GigaHttpClient } from "./giga-http-client";
-import { Observable, catchError, defer, firstValueFrom, map, of, shareReplay, switchMap } from "rxjs";
+import { Observable, Subject, catchError, defer, firstValueFrom, map, of, shareReplay, switchMap, tap } from "rxjs";
 
 /**
  * Singleton service providing access to products.
@@ -35,6 +35,9 @@ export class ProductsService {
   );
 
   private facets$: Observable<IProductFacets>;
+
+  /** Emits after a manual inventory reset (see resetInventory) so views can reload. */
+  readonly inventoryReset$ = new Subject<void>();
 
   /** One page of products matching the query (defaults: page 1, 24 per page). */
   getPage(query: IProductQuery): Observable<IProductPage> {
@@ -74,6 +77,22 @@ export class ProductsService {
       switchMap(() => this.gigaHttpClient.getProduct(id)),
       map(p => this.intern(p))
     ));
+  }
+
+  /**
+   * Demo tool: restores the server catalog (POST /api/products/reset) and forgets every
+   * product held in memory, so the next request returns fresh stock levels. The caller
+   * should empty the cart first, since cart lines hold stock taken from those products.
+   */
+  resetInventory(): Observable<void> {
+    return this.gigaHttpClient.resetProducts().pipe(
+      map(() => undefined),
+      tap(() => {
+        this.known.clear();
+        this.facets$ = undefined;
+        this.inventoryReset$.next();
+      })
+    );
   }
 
   private intern(product: IProduct): IProduct {

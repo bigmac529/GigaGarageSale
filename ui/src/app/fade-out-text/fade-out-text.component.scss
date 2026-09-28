@@ -1,10 +1,20 @@
-span {
-  margin-left: 20px;
-  font-size: .8em;
-  background-color: rgb(29, 176, 249);
-  color: white;
-  padding: 3px 7px 3px 7px;
-  border-radius: 7px;  
-  transition: opacity 2s;
-  transition-delay: 1s;
+.fade-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+.fade-text::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
 }

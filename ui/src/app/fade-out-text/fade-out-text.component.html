@@ -1,1 +1,3 @@
-<span *ngIf="isVisible" [@fadeOut]>{{text}}</span>
+@if (isVisible) {
+  <span class="fade-text" [@fadeOut]>{{ text }}</span>
+}

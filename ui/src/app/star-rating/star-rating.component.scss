@@ -1,27 +1,4 @@
-main {
-    margin:10px;
-}
-#merchant {
-  font-size: 1em;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 10px;
-  text-align: center;
-  font-style: italic;
-  background-color: rgb(29, 176, 249);
-  width: fit-content;
-  padding: 2px 8px 4px 8px;
-  border-radius: 5px;
-  color: white;
-}
-
-#stars {
-  display: flex;
-  padding-left: 15px;
-}
-
-.star {
-  width: 50px;
-  height: auto;
-  display: inline-block;
-}
+.stars { display: inline-flex; align-items: center; gap: 2px; }
+.star { color: var(--surface-3); }
+.star.on { color: var(--star); }
+.value { margin-left: 6px; color: var(--text); font-size: var(--fs-sm); font-weight: var(--fw-semibold); }

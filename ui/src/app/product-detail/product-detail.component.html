@@ -1,38 +1,100 @@
-<main *ngIf="product">
-  <section id="image">
-    <a href="{{product?.imageUrl}}" target="_blank"><img src="{{product?.imageUrl}}" /></a>
-  </section>
-  <section id="details">
-    <div id="name">{{product?.name}}</div>
-    <div id="primaryDetails">
-      <div id="primaryDetailsAttributes">
-        <div id="brand">Brand: {{product?.brand}}</div>
-        <div id="category">Category: {{product?.category}}</div>
-      </div>
-      <div id="rating">
-        <app-star-rating [product]="product"></app-star-rating>
-      </div>
-    </div>
-
-    <div id="descriptions">
-      <ul *ngIf="product">
-        <li *ngFor="let description of product.descriptions">
-          {{description}}
+@if (product) {
+  <div class="detail container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li>
+          <a id="backToShop" [routerLink]="['/shop']" [queryParams]="shopParams">
+            <app-icon name="arrow-left" [size]="16" /> Shop
+          </a>
         </li>
-      </ul>
+        <li><a [routerLink]="['/shop']" [queryParams]="{ category: product.category }">{{ product.category }}</a></li>
+        <li aria-current="page"><span>{{ product.title }}</span></li>
+      </ol>
+    </nav>
+
+    <div class="layout">
+      <div class="gallery">
+        <a class="image-well" [href]="product.imageUrl" target="_blank" rel="noopener" [attr.aria-label]="'Open full-size image of ' + product.title + ' in a new tab'">
+          <img [src]="product.imageUrl" [alt]="product.title" width="600" height="500" />
+        </a>
+      </div>
+
+      <div class="head">
+        <p class="kicker">{{ product.brand }} · {{ product.category }}</p>
+        <h1 id="name">{{ product.name }}</h1>
+        <div class="rating-row">
+          <app-star-rating [product]="product" />
+          <span class="seller">Sold by
+            <a [routerLink]="['/shop']" [queryParams]="{ merchant: product.merchant }">{{ product.merchant }}</a>
+          </span>
+        </div>
+      </div>
+
+      <section class="buy" aria-label="Purchase">
+        <div class="price-block">
+          <p id="price" class="price">{{ product.price | currency: 'USD' }}</p>
+          @if (product.available > 0) {
+            <p class="stock in"><span class="dot" aria-hidden="true"></span><span class="stock-label">In stock · </span>{{ product.available }} available</p>
+          } @else {
+            <p class="stock out"><span class="dot" aria-hidden="true"></span>Out of stock</p>
+          }
+        </div>
+        <div class="buy-actions">
+          <div class="stepper" role="group" aria-label="Quantity">
+            <button type="button" (click)="setQuantity(quantity - 1)" [disabled]="quantity <= 1 || product.available <= 0" aria-label="Decrease quantity"><app-icon name="minus" [size]="18" /></button>
+            <output class="qty" aria-live="polite" [attr.aria-label]="'Quantity ' + quantity">{{ quantity }}</output>
+            <button type="button" (click)="setQuantity(quantity + 1)" [disabled]="quantity >= product.available" aria-label="Increase quantity"><app-icon name="plus" [size]="18" /></button>
+          </div>
+          <button type="button" id="addToCart" class="btn btn-primary btn-lg add" (click)="addToCart()" [disabled]="product.available <= 0">
+            <app-icon name="cart-plus" [size]="20" />
+            {{ product.available > 0 ? 'Add to cart' : 'Sold out' }}
+          </button>
+        </div>
+        @if (lastAdded) {
+          <p class="added" role="status">
+            <app-icon name="check" [size]="16" /> Added {{ lastAdded }} to your cart.
+            <a [routerLink]="['/cart']">View cart</a>
+          </p>
+        }
+      </section>
+
+      <section class="about-item" aria-labelledby="aboutItem">
+        <h2 id="aboutItem">About this item</h2>
+        <ul class="descriptions">
+          @for (description of product.descriptions; track $index) {
+            <li><app-icon name="check" [size]="16" />{{ description }}</li>
+          }
+        </ul>
+        <dl class="specs">
+          <div><dt>Brand</dt><dd>{{ product.brand }}</dd></div>
+          <div><dt>Category</dt><dd>{{ product.category }}</dd></div>
+          <div><dt>Seller</dt><dd>{{ product.merchant }}</dd></div>
+          <div><dt>Rating</dt><dd>{{ product.rating }} / 5</dd></div>
+        </dl>
+      </section>
     </div>
-    <div id="retail">
-      <div id="price">{{product?.price | currency: 'USD'}}</div>
-      <div id="addToCart">
-        <span>Available: {{product?.available}}</span>
-        <button (click)="addToCart()">Add to cart</button>
+  </div>
+}
+@if (notFound) {
+  <div class="container">
+    <div class="not-found notice">
+      <span class="notice-icon"><app-icon name="package" [size]="28" /></span>
+      <h1 class="notice-title">Product not found</h1>
+      <p>This item is no longer listed on GigaGarageSale.</p>
+      <a class="btn btn-primary" [routerLink]="['/shop']" [queryParams]="shopParams">Back to the shop</a>
+    </div>
+  </div>
+}
+@if (!product && !notFound) {
+  <div class="container detail loading" aria-busy="true">
+    <div class="layout">
+      <div class="gallery"><div class="skeleton sk-image"></div></div>
+      <div class="head">
+        <div class="skeleton sk-line short"></div>
+        <div class="skeleton sk-title"></div>
+        <div class="skeleton sk-line"></div>
       </div>
     </div>
-    
-  </section>
-</main>
-<div class="not-found" *ngIf="notFound">
-  <h2>Product not found</h2>
-  <p>This item is no longer listed on GigaGarageSale.</p>
-  <a [routerLink]="['/shop']">Back to the shop</a>
-</div>
+    <p class="visually-hidden" role="status">Loading product…</p>
+  </div>
+}

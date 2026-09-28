@@ -1,14 +1,17 @@
-import { Component, ElementRef, Input, OnInit, Renderer2, ViewChild, inject } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IProduct } from '../../../../shared/i-product';
-import { CommonModule } from '@angular/common';
+import { IconComponent } from '../shared/icon/icon.component';
 
+/** Five-star rating display (1-5), announced as "Rated N out of 5". */
 @Component({
   selector: 'app-star-rating',
-  imports: [CommonModule],
+  imports: [IconComponent],
   templateUrl: './star-rating.component.html',
   styleUrl: './star-rating.component.scss'
 })
 export class StarRatingComponent {
+
+  readonly stars = [1, 2, 3, 4, 5];
 
   _product: IProduct = {} as IProduct;
   get product(): IProduct {
@@ -17,5 +20,9 @@ export class StarRatingComponent {
   @Input()
   set product(value: IProduct) {
     this._product = value;
+  }
+
+  get rating(): number {
+    return Math.max(0, Math.min(5, Math.round(this._product?.rating ?? 0)));
   }
 }
