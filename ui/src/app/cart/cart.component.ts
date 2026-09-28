@@ -1,26 +1,31 @@
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { ShoppingCartService } from '../shared/shopping-cart-service';
 import { IShoppingCartItem } from '../shared/i-shopping-cart-item';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { ShopMemoryService } from '../shared/shop-memory.service';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   selector: 'app-cart',
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatButtonModule
-  ],
+  imports: [CurrencyPipe, RouterModule, IconComponent],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
 export class CartComponent {
   readonly cartSvc: ShoppingCartService = inject(ShoppingCartService);
-  readonly productSvc: ShoppingCartService = inject(ShoppingCartService);
-  readonly dialog = inject(MatDialog);
   readonly router = inject(Router);
+  private readonly memory = inject(ShopMemoryService);
+
+  @ViewChild('checkoutDialog') checkoutDialog?: ElementRef<HTMLDialogElement>;
+
+  /** Confirmation number shown in the checkout dialog. */
+  orderConfirmationNumber = '';
+
+  /** Query params of the last shop view, so "Continue shopping" returns to it. */
+  get shopParams() {
+    return this.memory.lastParams;
+  }
 
   /** Adds one more of the item, respecting stock (same rule as the product page). */
   increase(item: IShoppingCartItem): void {
@@ -42,47 +47,19 @@ export class CartComponent {
     }
   }
 
+  /** Shows the order confirmation; closing it (OK, Escape) empties the cart and returns to the shop. */
   checkout(): void {
-    let enterAnimationDuration = '1000ms';
-    let exitAnimationDuration = '1000ms';
-
-    this.dialog.open(CheckoutDialog, {
-      width: "250px",
-      enterAnimationDuration,
-      exitAnimationDuration
-    }).afterClosed().subscribe({
-      next: () => {
-        this.cartSvc.clearCart();
-        this.router.navigate(['/shop']);
-      }
-    });
+    this.orderConfirmationNumber = Math.floor(Math.random() * 1000000).toString();
+    const dialog = this.checkoutDialog?.nativeElement;
+    if (dialog?.showModal) {
+      dialog.showModal();
+    } else {
+      this.finishCheckout();
+    }
   }
 
-  
-}
-
-@Component({
-  selector: 'dialog-animations-example-dialog',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-  <h2 mat-dialog-title>Order confirmation #{{orderConfirmationNumber}}</h2>
-  <mat-dialog-content>
-    Thank you for your order. Your products will be shipped within 3-5 business days.
-  </mat-dialog-content>
-  <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial>Ok</button>
-  </mat-dialog-actions>
-  `
-})
-export class CheckoutDialog {
-  readonly dialogRef = inject(MatDialogRef<CheckoutDialog>);
-
-  orderConfirmationNumber: string = this.getOrderConfirmationNumber();
-
-  getOrderConfirmationNumber(): string {
-    return this.orderConfirmationNumber = (Math.floor(Math.random() * 1000000)).toString();
+  finishCheckout(): void {
+    this.cartSvc.clearCart();
+    this.router.navigate(['/shop']);
   }
-
-  
 }
