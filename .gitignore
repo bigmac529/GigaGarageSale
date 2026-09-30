@@ -4,3 +4,6 @@
 **/dist/**
 **/node_modules/**
 **/.angular/**
+
+# Local SQLite catalog (npm run dev:db)
+api/data/

@@ -5,20 +5,31 @@
   "main": "index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "test": "node -r ts-node/register --test src/product-query.test.ts",
-    "start:prod": "ts-node src/index.ts"
+    "test": "node -r ts-node/register --test src/product-query.test.ts src/catalog/config.test.ts src/catalog/db-mode.test.ts src/catalog/sqlserver.test.ts",
+    "start:prod": "ts-node src/index.ts",
+    "db:seed": "ts-node scripts/db-seed.ts",
+    "dev:db": "ts-node scripts/db-seed.ts --provider sqlite",
+    "start:sqlite": "ts-node scripts/start-sqlite.ts",
+    "typecheck": "tsc --noEmit -p ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/mssql": "^12.3.0",
     "@types/node": "^22.14.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "mssql": "^12.7.2",
+    "tedious": "^19.2.2",
     "ts-node": "^10.9.2"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "12.9.0"
   }
 }
